@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - Reverse Shopping</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+<body>
+
+    <h1>Seller Dashboard</h1>
+
+    <h2>Welcome, {{ seller.name }}</h2>
+
+    <p>View buyer requirements and submit your best offers.</p>
+
+    <a href="/buyer-requirements/">
+        <button>View Buyer Requirements</button>
+    </a>
+
+</body>
+</html>

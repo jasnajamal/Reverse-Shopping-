@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requirements - Reverse Shopping</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+<body>
+
+    <h1>My Requirements</h1>
+
+    {% if requirements %}
+
+        {% for requirement in requirements %}
+
+            <h2>{{ requirement.product_type }}</h2>
+
+            <p><strong>Category:</strong> {{ requirement.category.name }}</p>
+
+            <p>
+                <strong>Budget:</strong>
+                ₹{{ requirement.budget_min }} - ₹{{ requirement.budget_max }}
+            </p>
+
+            <p>
+                <strong>Preferred Brand:</strong>
+                {{ requirement.preferred_brand|default:"Not specified" }}
+            </p>
+
+            <p>
+                <strong>Condition:</strong>
+                {{ requirement.condition_type|default:"Not specified" }}
+            </p>
+
+            <p>
+                <strong>Additional Requirements:</strong>
+                {{ requirement.additional_requirements|default:"None" }}
+            </p>
+
+            <p>
+                <strong>Required By:</strong>
+                {{ requirement.required_by|default:"Not specified" }}
+            </p>
+            <a href="/view-offers/{{ requirement.id }}/">
+                <button>View Seller Offers</button>
+            </a>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>You have not posted any requirements yet.</p>
+
+    {% endif %}
+
+    <a href="/buyer/">Back to Buyer Dashboard</a>
+
+</body>
+</html>

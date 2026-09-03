@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Requirements - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>Buyer Requirements</h1>
+    </div>
+
+    <div class="container">
+
+        {% if requirement_data %}
+
+            {% for item in requirement_data %}
+
+                <div class="card">
+
+                    <h2>{{ item.requirement.product_type }}</h2>
+
+                    <p>
+                        <strong>Category:</strong>
+                        {{ item.requirement.category.name }}
+                    </p>
+
+                    <p>
+                        <strong>Budget:</strong>
+                        ₹{{ item.requirement.budget_min }} -
+                        ₹{{ item.requirement.budget_max }}
+                    </p>
+
+                    <p>
+                        <strong>Preferred Brand:</strong>
+                        {{ item.requirement.preferred_brand|default:"Not specified" }}
+                    </p>
+
+                    <p>
+                        <strong>Condition:</strong>
+                        {{ item.requirement.condition_type|default:"Not specified" }}
+                    </p>
+
+                    <p>
+                        <strong>Additional Requirements:</strong>
+                        {{ item.requirement.additional_requirements|default:"None" }}
+                    </p>
+
+                    <p>
+                        <strong>Required By:</strong>
+                        {{ item.requirement.required_by|default:"Not specified" }}
+                    </p>
+
+                    {% if item.offer %}
+
+                        <p>
+                            <strong>Your Offer:</strong>
+                            ₹{{ item.offer.offer_price }}
+                        </p>
+
+                        <a href="/update-offer/{{ item.offer.id }}/">
+                            <button>Update Offer</button>
+                        </a>
+
+                    {% else %}
+
+                        <a href="/submit-offer/{{ item.requirement.id }}/">
+                            <button>Submit Offer</button>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="card">
+                <p>No matching buyer requirements available.</p>
+            </div>
+
+        {% endif %}
+
+        <br>
+
+        <a href="/seller/">
+            <button>Back to Seller Dashboard</button>
+        </a>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Seller Offers - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>Seller Offers</h1>
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+            <h2>{{ requirement.product_type }}</h2>
+
+            <p>
+                <strong>Category:</strong>
+                {{ requirement.category.name }}
+            </p>
+
+            <p>
+                <strong>Your Budget:</strong>
+                ₹{{ requirement.budget_min }} - ₹{{ requirement.budget_max }}
+            </p>
+        </div>
+
+        {% if offers %}
+
+            {% for offer in offers %}
+
+                <div class="card">
+
+                    <h2>{{ offer.product.product_name }}</h2>
+
+                    <p>
+                        <strong>Seller:</strong>
+                        {{ offer.product.seller.name }}
+                    </p>
+
+                    <p>
+                        <strong>Offer Price:</strong>
+                        ₹{{ offer.offer_price }}
+                    </p>
+
+                    <p>
+                        <strong>Product Price:</strong>
+                        ₹{{ offer.product.price }}
+                    </p>
+
+                    <p>
+                        <strong>Brand:</strong>
+                        {{ offer.product.brand|default:"Not specified" }}
+                    </p>
+
+                    <p>
+                        <strong>Condition:</strong>
+                        {{ offer.product.condition_type }}
+                    </p>
+
+                    <p>
+                        <strong>Delivery:</strong>
+                        {{ offer.delivery_days|default:"Not specified" }} days
+                    </p>
+
+                    <p>
+                        <strong>Warranty:</strong>
+                        {{ offer.warranty|default:"Not specified" }}
+                    </p>
+
+                    <p>
+                        <strong>Seller Message:</strong>
+                        {{ offer.message|default:"None" }}
+                    </p>
+
+                    <br>
+
+                    <a href="/select-offer/{{ offer.id }}/">
+                        <button>Select This Offer</button>
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="card">
+                <p>No offers received yet.</p>
+            </div>
+
+        {% endif %}
+
+        <a href="/my-requirements/">
+            <button>Back to My Requirements</button>
+        </a>
+
+    </div>
+
+</body>
+</html>

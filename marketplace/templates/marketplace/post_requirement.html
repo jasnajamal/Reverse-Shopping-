@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Requirement - Reverse Shopping</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+<body>
+
+    <h1>Post Product Requirement</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Product Type:</label><br>
+        <input type="text" name="product_type" required>
+        <br><br>
+
+        <label>Category:</label><br>
+        <select name="category_id" required>
+            <option value="">Select Category</option>
+
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+
+        </select>
+        <br><br>
+
+        <label>Minimum Budget:</label><br>
+        <input type="number" name="budget_min" step="0.01">
+        <br><br>
+
+        <label>Maximum Budget:</label><br>
+        <input type="number" name="budget_max" step="0.01">
+        <br><br>
+
+        <label>Preferred Brand:</label><br>
+        <input type="text" name="preferred_brand">
+        <br><br>
+
+        <label>Condition:</label><br>
+        <select name="condition_type">
+            <option value="">Select Condition</option>
+            <option value="new">New</option>
+            <option value="used">Used</option>
+        </select>
+        <br><br>
+
+        <label>Additional Requirements:</label><br>
+        <textarea name="additional_requirements"></textarea>
+        <br><br>
+
+        <label>Required By:</label><br>
+        <input type="date" name="required_by">
+        <br><br>
+
+        <button type="submit">Post Requirement</button>
+        <br><br>
+
+        
+    </form>
+
+</body>
+</html>
