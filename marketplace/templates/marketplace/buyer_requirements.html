@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Buyer Requirements - Reverse Shopping</title>
 
     {% load static %}
@@ -13,6 +14,7 @@
 
     <div class="top-bar">
         <h1>Buyer Requirements</h1>
+        <p>Matching requirements for {{ seller.name }}</p>
     </div>
 
     <div class="container">
@@ -56,14 +58,18 @@
                         {{ item.requirement.required_by|default:"Not specified" }}
                     </p>
 
-                    {% if item.offer %}
+                    <hr>
+
+                    {% if item.own_offer %}
+
+                        <h3>Your Offer</h3>
 
                         <p>
-                            <strong>Your Offer:</strong>
-                            ₹{{ item.offer.offer_price }}
+                            <strong>Offer Price:</strong>
+                            ₹{{ item.own_offer.offer_price }}
                         </p>
 
-                        <a href="/update-offer/{{ item.offer.id }}/">
+                        <a href="/update-offer/{{ item.own_offer.id }}/">
                             <button>Update Offer</button>
                         </a>
 
@@ -72,6 +78,42 @@
                         <a href="/submit-offer/{{ item.requirement.id }}/">
                             <button>Submit Offer</button>
                         </a>
+
+                    {% endif %}
+
+
+                    {% if item.competing_offers %}
+
+                        <hr>
+
+                        <h3>Competing Sellers</h3>
+
+                        {% for offer in item.competing_offers %}
+
+                            <div class="card">
+
+                                <p>
+                                    <strong>Seller:</strong>
+                                    {{ offer.product.seller.name }}
+                                </p>
+
+                                <p>
+                                    <strong>Offer Price:</strong>
+                                    ₹{{ offer.offer_price }}
+                                </p>
+
+                                <p>
+                                    <strong>Delivery:</strong>
+                                    {{ offer.delivery_days|default:"Not specified" }} days
+                                </p>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p>No other seller offers yet.</p>
 
                     {% endif %}
 

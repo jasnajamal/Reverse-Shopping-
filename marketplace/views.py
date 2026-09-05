@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Users, Requirements, Categories, Products, Offers
+from .models import Users, Requirements, Categories, Products, Offers, Orders
 
 
 def home(request):
@@ -16,7 +16,15 @@ def login_view(request):
         try:
             user = Users.objects.get(email=email)
 
-            if check_password(password, user.password):
+            password_valid = check_password(password, user.password)
+
+            # Support old accounts created before password hashing
+            if not password_valid and user.password == password:
+                user.password = make_password(password)
+                user.save(update_fields=['password'])
+                password_valid = True
+
+            if password_valid:
                 request.session['user_id'] = user.id
                 request.session['user_role'] = user.role
 
@@ -24,13 +32,13 @@ def login_view(request):
                     return redirect('/buyer/')
                 elif user.role == 'seller':
                     return redirect('/seller/')
+
             messages.error(request, 'Invalid email or password.')
 
         except Users.DoesNotExist:
             messages.error(request, 'Invalid email or password.')
 
     return render(request, 'marketplace/login.html')
-
 
 def register_view(request):
     if request.method == 'POST':
@@ -157,14 +165,25 @@ def buyer_requirements(request):
     requirement_data = []
 
     for requirement in requirements:
-        offer = Offers.objects.filter(
+
+        own_offer = Offers.objects.filter(
             requirement=requirement,
             product__seller=seller
         ).first()
 
+        competing_offers = Offers.objects.filter(
+            requirement=requirement
+        ).exclude(
+            product__seller=seller
+        ).select_related(
+            'product',
+            'product__seller'
+        ).order_by('offer_price')
+
         requirement_data.append({
             'requirement': requirement,
-            'offer': offer
+            'own_offer': own_offer,
+            'competing_offers': competing_offers
         })
 
     return render(
@@ -281,32 +300,6 @@ def update_offer(request, offer_id):
         }
     )
 
-def view_offers(request, requirement_id):
-    buyer_id = request.session.get('user_id')
-
-    if not buyer_id:
-        return redirect('/login/')
-
-    if request.session.get('user_role') != 'buyer':
-        return redirect('/login/')
-
-    requirement = Requirements.objects.get(
-        id=requirement_id,
-        buyer_id=buyer_id
-    )
-
-    offers = Offers.objects.filter(
-        requirement=requirement
-    ).select_related('product', 'product__seller').order_by('offer_price')
-
-    return render(
-        request,
-        'marketplace/view_offers.html',
-        {
-            'requirement': requirement,
-            'offers': offers
-        }
-    )
 
 def view_offers(request, requirement_id):
     buyer_id = request.session.get('user_id')
@@ -337,3 +330,64 @@ def view_offers(request, requirement_id):
             'offers': offers
         }
     )
+
+def select_offer(request, offer_id):
+    buyer_id = request.session.get('user_id')
+
+    if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
+    offer = Offers.objects.get(
+        id=offer_id,
+        requirement__buyer_id=buyer_id
+    )
+
+    # Prevent selecting the same requirement again
+    if Orders.objects.filter(
+        buyer_id=buyer_id,
+        offer__requirement=offer.requirement
+    ).exists():
+        messages.info(request, 'You have already selected an offer for this requirement.')
+        return redirect(f'/view-offers/{offer.requirement.id}/')
+
+    Orders.objects.create(
+        buyer_id=buyer_id,
+        offer=offer,
+        order_status='pending'
+    )
+
+    messages.success(
+        request,
+        f'Offer from {offer.product.seller.name} selected successfully.'
+    )
+
+    return redirect(f'/view-offers/{offer.requirement.id}/')
+
+def my_offers(request):
+    seller_id = request.session.get('user_id')
+
+    if not seller_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'seller':
+        return redirect('/login/')
+
+    offers = Offers.objects.filter(
+        product__seller_id=seller_id
+    ).select_related(
+        'product',
+        'requirement'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/my_offers.html',
+        {'offers': offers}
+    )
+
+def logout_view(request):
+    request.session.flush()
+    return redirect('/login/')

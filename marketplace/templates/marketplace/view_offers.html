@@ -82,9 +82,28 @@
 
                     <br>
 
-                    <a href="/select-offer/{{ offer.id }}/">
-                        <button>Select This Offer</button>
-                    </a>
+                   {% if selected_order and selected_order.offer.id == offer.id %}
+
+                        <p>
+                            <strong>✓ Selected Offer</strong>
+                        </p>
+
+                        <p>
+                            <strong>Order Status:</strong>
+                            {{ selected_order.order_status }}
+                        </p>
+
+                    {% elif selected_order %}
+
+                        <p>Offer not selected.</p>
+
+                    {% else %}
+
+                        <a href="/select-offer/{{ offer.id }}/">
+                            <button>Select This Offer</button>
+                        </a>
+
+                    {% endif %}
 
                 </div>
 

@@ -3,20 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Reverse Shopping</title>
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
 </head>
+
 <body>
 
-    <h1>Reverse Shopping</h1>
+    <div class="top-bar">
+        <h1>Reverse Shopping</h1>
+    </div>
 
-    <h2>Buy what you want at the best price</h2>
+    <div class="container">
 
-    <p>Post your requirement and let sellers compete with their best offers.</p>
+        <div class="card">
 
-    <button>I'm a Buyer</button>
-    <button>I'm a Seller</button>
+            <h2>Buy What You Want at the Best Price</h2>
+
+            <p>
+                Post your requirement and let sellers compete
+                with their best offers.
+            </p>
+
+            <div class="actions">
+
+                <a href="/login/">
+                    <button>Buyer / Seller Login</button>
+                </a>
+
+                <a href="/register/">
+                    <button>Create Account</button>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
 </html>

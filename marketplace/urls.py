@@ -13,6 +13,8 @@ urlpatterns = [
     path('submit-offer/<int:requirement_id>/', views.submit_offer, name='submit_offer'),
     path('update-offer/<int:offer_id>/', views.update_offer, name='update_offer'),
     path('view-offers/<int:requirement_id>/', views.view_offers, name='view_offers'),
-    path('view-offers/<int:requirement_id>/', views.view_offers, name='view_offers'),
+    path('select-offer/<int:offer_id>/', views.select_offer, name='select_offer'),
+    path('my-offers/', views.my_offers, name='my_offers'),
+    path('logout/', views.logout_view, name='logout'),
 
 ]
