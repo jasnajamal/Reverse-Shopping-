@@ -3,24 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Buyer Dashboard - Reverse Shopping</title>
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
 </head>
+
 <body>
 
-    <h1>Buyer Dashboard</h1>
+    <div class="top-bar">
+        <h1>Buyer Dashboard</h1>
+        <p>Welcome to Reverse Shopping</p>
+    </div>
 
-    <h2>Welcome to Reverse Shopping</h2>
+    <div class="container">
 
-    <p>From here, you can manage your requirements and view seller offers.</p>
-    <a href="/post-requirement/">
-        <button>Post Product Requirement</button>
-    </a>
-    <br><br>
+        <div class="card">
 
-    <a href="/logout/">
-        <button>Logout</button>
-    </a>
+            <h2>Manage Your Shopping Requirements</h2>
+
+            <p>
+                Post what you need and compare competitive seller offers.
+            </p>
+
+            <div class="actions">
+
+                <a href="/post-requirement/">
+                    <button>Post Product Requirement</button>
+                </a>
+
+                <a href="/my-requirements/">
+                    <button>My Requirements</button>
+                </a>
+
+                <a href="/logout/">
+                    <button>Logout</button>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </body>
 </html>

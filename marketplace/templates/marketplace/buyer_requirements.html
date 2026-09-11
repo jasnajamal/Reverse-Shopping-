@@ -34,7 +34,8 @@
 
                     <p>
                         <strong>Budget:</strong>
-                        ₹{{ item.requirement.budget_min }} -
+                        ₹{{ item.requirement.budget_min }}
+                        -
                         ₹{{ item.requirement.budget_max }}
                     </p>
 
@@ -52,6 +53,24 @@
                         <strong>Additional Requirements:</strong>
                         {{ item.requirement.additional_requirements|default:"None" }}
                     </p>
+
+                    {% if item.requirement.requirementimages_set.all %}
+
+                        {% for image in item.requirement.requirementimages_set.all %}
+
+                            <p>
+                                <strong>Reference Image:</strong>
+                            </p>
+
+                            <img
+                                src="/media/{{ image.image_path }}"
+                                alt="Buyer Reference Image"
+                                style="max-width: 300px; border-radius: 10px;"
+                            >
+
+                        {% endfor %}
+
+                    {% endif %}
 
                     <p>
                         <strong>Required By:</strong>
@@ -81,7 +100,6 @@
 
                     {% endif %}
 
-
                     {% if item.competing_offers %}
 
                         <hr>
@@ -104,7 +122,8 @@
 
                                 <p>
                                     <strong>Delivery:</strong>
-                                    {{ offer.delivery_days|default:"Not specified" }} days
+                                    {{ offer.delivery_days|default:"Not specified" }}
+                                    days
                                 </p>
 
                             </div>

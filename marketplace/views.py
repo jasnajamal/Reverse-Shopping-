@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Users, Requirements, Categories, Products, Offers, Orders
+from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages
 
 
 def home(request):
@@ -93,8 +94,9 @@ def post_requirement(request):
         condition_type = request.POST.get('condition_type')
         additional_requirements = request.POST.get('additional_requirements')
         required_by = request.POST.get('required_by')
+        image = request.FILES.get('image')
 
-        Requirements.objects.create(
+        requirement = Requirements.objects.create(
             buyer=buyer,
             category_id=category_id,
             product_type=product_type,
@@ -105,6 +107,17 @@ def post_requirement(request):
             additional_requirements=additional_requirements or None,
             required_by=required_by or None
         )
+
+        if image:
+            image_path = default_storage.save(
+                f'requirement_images/{image.name}',
+                image
+            )
+
+            RequirementImages.objects.create(
+                requirement=requirement,
+                image_path=image_path
+            )
 
         messages.success(request, 'Requirement posted successfully.')
         return redirect('/my-requirements/')

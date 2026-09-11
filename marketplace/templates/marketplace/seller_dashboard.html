@@ -3,27 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Seller Dashboard - Reverse Shopping</title>
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
 </head>
+
 <body>
 
-    <h1>Seller Dashboard</h1>
+    <div class="top-bar">
+        <h1>Seller Dashboard</h1>
+        <p>Welcome, {{ seller.name }}</p>
+    </div>
 
-    <h2>Welcome, {{ seller.name }}</h2>
+    <div class="container">
 
-    <p>View buyer requirements and submit your best offers.</p>
+        <div class="card">
+            <h2>Manage Your Selling Activities</h2>
 
-    <a href="/buyer-requirements/">
-        <button>View Buyer Requirements</button>
-    </a>
-    <br><br>
+            <p>
+                View matching buyer requirements, submit competitive offers,
+                and manage your submitted offers.
+            </p>
 
-    <a href="/my-offers/">
-        <button>My Offers</button>
-    </a>
-    
+            <div class="actions">
+
+                <a href="/buyer-requirements/">
+                    <button>View Buyer Requirements</button>
+                </a>
+
+                <a href="/my-offers/">
+                    <button>My Offers</button>
+                </a>
+
+                <a href="/logout/">
+                    <button>Logout</button>
+                </a>
+
+            </div>
+        </div>
+
+    </div>
 
 </body>
 </html>
