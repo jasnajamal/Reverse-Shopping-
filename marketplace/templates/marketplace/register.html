@@ -3,51 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Register - Reverse Shopping</title>
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
 </head>
+
 <body>
 
-    <h1>Reverse Shopping</h1>
+    <div class="top-bar">
+        <h1>Reverse Shopping</h1>
+    </div>
 
-    <h2>Create Account</h2>
+    <div class="container">
 
-    <form method="POST">
-        {% csrf_token %}
+        <div class="card">
 
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
+            <h2>Create Account</h2>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
-
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-
-        <label>Register as:</label><br>
-        <select name="role" required>
-            <option value="">Select Role</option>
-            <option value="buyer">Buyer</option>
-            <option value="seller">Seller</option>
-        </select><br><br>
-
-        <div id="seller-category">
-            <label>What do you sell?</label><br>
-            <select name="category_id">
-                <option value="">Select Category</option>
-
-                {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.name }}</option>
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{ message }}</p>
                 {% endfor %}
-            </select>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label>Name:</label>
+                <input type="text" name="name" required>
+
+                <label>Email:</label>
+                <input type="email" name="email" required>
+
+                <label>Password:</label>
+                <input type="password" name="password" required>
+
+                <label>Register as:</label>
+                <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                </select>
+
+                <div id="seller-category">
+
+                    <label>What do you sell?</label>
+
+                    <select name="category_id">
+                        <option value="">Select Category</option>
+
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+
+                <button type="submit">Register</button>
+
+            </form>
+
+            <script>
+                const roleSelect = document.querySelector('select[name="role"]');
+                const sellerCategory = document.getElementById('seller-category');
+                const categorySelect = document.querySelector('select[name="category_id"]');
+
+                function updateCategoryVisibility() {
+                    if (roleSelect.value === 'seller') {
+                        sellerCategory.style.display = 'block';
+                        categorySelect.required = true;
+                    } else {
+                        sellerCategory.style.display = 'none';
+                        categorySelect.required = false;
+                        categorySelect.value = '';
+                    }
+                }
+
+                roleSelect.addEventListener('change', updateCategoryVisibility);
+
+                updateCategoryVisibility();
+            </script>
+
+            <br>
+
+            <p>Already have an account?</p>
+
+            <a href="/login/">
+                <button type="button">Login</button>
+            </a>
+
         </div>
 
-        <button type="submit">Register</button>
-    </form>
-
-    <p>Already have an account?</p>
-    <a href="/login/">Login</a>
+    </div>
 
 </body>
 </html>

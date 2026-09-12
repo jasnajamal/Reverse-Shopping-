@@ -11,7 +11,7 @@
 
     <h1>Post Product Requirement</h1>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         <label>Product Type:</label><br>
@@ -52,8 +52,9 @@
         <label>Additional Requirements:</label><br>
         <textarea name="additional_requirements"></textarea>
         <br><br>
-        image = request.FILES.get('image')
-
+        <label>Reference Image:</label><br>
+        <input type="file" name="image" accept="image/*">
+        <br><br>
         <label>Required By:</label><br>
         <input type="date" name="required_by">
         <br><br>

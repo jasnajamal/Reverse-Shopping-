@@ -3,30 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login - Reverse Shopping</title>
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
 </head>
+
 <body>
 
-    <h1>Reverse Shopping</h1>
+    <div class="top-bar">
+        <h1>Reverse Shopping</h1>
+    </div>
 
-    <h2>Login</h2>
+    <div class="container">
 
-    <form method="POST">
-        {% csrf_token %}
+        <div class="card">
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+            <h2>Login</h2>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
 
-        <button type="submit">Login</button>
-    </form>
+            <form method="POST">
+                {% csrf_token %}
 
-    <p>Don't have an account?</p>
-    <a href="/register/">Create Account</a>
+                <label>Email:</label>
+                <input type="email" name="email" required>
+
+                <label>Password:</label>
+                <input type="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <br>
+
+            <p>Don't have an account?</p>
+
+            <a href="/register/">
+                <button type="button">Create Account</button>
+            </a>
+
+        </div>
+
+    </div>
 
 </body>
 </html>

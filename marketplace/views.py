@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages
+from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages
 
 
 def home(request):
@@ -47,19 +47,41 @@ def register_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         role = request.POST.get('role')
+        category_id = request.POST.get('category_id')
 
         if Users.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered.')
-            return render(request, 'marketplace/register.html')
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': Categories.objects.all()}
+            )
 
-        category_id = request.POST.get('category_id')
+        if role not in ['buyer', 'seller']:
+            messages.error(request, 'Please select a valid role.')
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': Categories.objects.all()}
+            )
+
+        if role == 'seller' and not category_id:
+            messages.error(request, 'Please select a selling category.')
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': Categories.objects.all()}
+            )
+
+        if role == 'buyer':
+            category_id = None
 
         Users.objects.create(
             name=name,
             email=email,
             password=make_password(password),
             role=role,
-            category_id=category_id or None
+            category_id=category_id
         )
 
         messages.success(request, 'Registration successful. Please login.')
@@ -73,14 +95,30 @@ def register_view(request):
         {'categories': categories}
     )
 
-
 def buyer_dashboard(request):
-    return render(request, 'marketplace/buyer_dashboard.html')
+    buyer_id = request.session.get('user_id')
+
+    if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
+    buyer = Users.objects.get(id=buyer_id, role='buyer')
+
+    return render(
+        request,
+        'marketplace/buyer_dashboard.html',
+        {'buyer': buyer}
+    )
 
 def post_requirement(request):
     buyer_id = request.session.get('user_id')
 
     if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
     buyer = Users.objects.get(id=buyer_id, role='buyer')
@@ -136,6 +174,9 @@ def my_requirements(request):
     if not buyer_id:
         return redirect('/login/')
 
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
     requirements = Requirements.objects.filter(
         buyer_id=buyer_id
     ).order_by('-id')
@@ -150,6 +191,9 @@ def seller_dashboard(request):
     seller_id = request.session.get('user_id')
 
     if not seller_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
     seller = Users.objects.get(id=seller_id, role='seller')
@@ -220,7 +264,11 @@ def submit_offer(request, requirement_id):
     seller = Users.objects.get(id=seller_id, role='seller')
     requirement = Requirements.objects.get(id=requirement_id)
 
-    # Check whether this seller already submitted an offer
+    # Allow seller to submit offers only for their category
+    if seller.category_id != requirement.category_id:
+        return redirect('/buyer-requirements/')
+
+    # Prevent duplicate offers from the same seller
     existing_offer = Offers.objects.filter(
         requirement=requirement,
         product__seller=seller
@@ -241,6 +289,10 @@ def submit_offer(request, requirement_id):
         warranty = request.POST.get('warranty')
         message = request.POST.get('message')
 
+        # Get uploaded product image
+        product_image = request.FILES.get('product_image')
+
+        # Create product
         product = Products.objects.create(
             seller=seller,
             category=requirement.category,
@@ -251,6 +303,19 @@ def submit_offer(request, requirement_id):
             brand=brand or None
         )
 
+        # Save product image
+        if product_image:
+            image_path = default_storage.save(
+                f'product_images/{product_image.name}',
+                product_image
+            )
+
+            ProductImages.objects.create(
+                product=product,
+                image_path=image_path
+            )
+
+        # Create offer
         Offers.objects.create(
             requirement=requirement,
             product=product,
@@ -268,7 +333,7 @@ def submit_offer(request, requirement_id):
         'marketplace/submit_offer.html',
         {'requirement': requirement}
     )
-
+    
 def update_offer(request, offer_id):
     seller_id = request.session.get('user_id')
 
@@ -335,12 +400,22 @@ def view_offers(request, requirement_id):
         'product__seller'
     ).order_by('offer_price')
 
+    selected_order = Orders.objects.filter(
+        buyer_id=buyer_id,
+        offer__requirement=requirement
+    ).select_related(
+        'offer',
+        'offer__product',
+        'offer__product__seller'
+    ).first()
+
     return render(
         request,
         'marketplace/view_offers.html',
         {
             'requirement': requirement,
-            'offers': offers
+            'offers': offers,
+            'selected_order': selected_order
         }
     )
 

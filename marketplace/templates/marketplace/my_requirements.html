@@ -43,6 +43,32 @@
                 <strong>Required By:</strong>
                 {{ requirement.required_by|default:"Not specified" }}
             </p>
+
+            {% if requirement.requirementimages_set.all %}
+
+                <p><strong>Reference Image:</strong></p>
+
+                {% for image in requirement.requirementimages_set.all %}
+
+                    <img
+                        src="/media/{{ image.image_path }}"
+                        alt="Reference Image"
+                        onclick="openImage(this.src)"
+                        style="
+                            max-width: 300px;
+                            max-height: 250px;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            object-fit: contain;
+                        "
+                    >
+
+                {% endfor %}
+
+            {% endif %}
+
+            <br><br>
+
             <a href="/view-offers/{{ requirement.id }}/">
                 <button>View Seller Offers</button>
             </a>
@@ -58,6 +84,69 @@
     {% endif %}
 
     <a href="/buyer/">Back to Buyer Dashboard</a>
+
+
+    <!-- Image Popup -->
+
+    <div
+        id="imagePopup"
+        onclick="closeImage()"
+        style="
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        "
+    >
+
+        <span
+            onclick="closeImage()"
+            style="
+                position: absolute;
+                top: 20px;
+                right: 30px;
+                color: white;
+                font-size: 35px;
+                cursor: pointer;
+            "
+        >
+            &times;
+        </span>
+
+        <img
+            id="popupImage"
+            src=""
+            alt="Reference Image"
+            onclick="event.stopPropagation()"
+            style="
+                max-width: 85%;
+                max-height: 85%;
+                border-radius: 10px;
+            "
+        >
+
+    </div>
+
+
+    <script>
+
+        function openImage(imageSrc) {
+            document.getElementById("popupImage").src = imageSrc;
+            document.getElementById("imagePopup").style.display = "flex";
+        }
+
+        function closeImage() {
+            document.getElementById("imagePopup").style.display = "none";
+            document.getElementById("popupImage").src = "";
+        }
+
+    </script>
 
 </body>
 </html>
