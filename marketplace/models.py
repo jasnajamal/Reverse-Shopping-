@@ -130,3 +130,13 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+class Notifications(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING)
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'notifications'

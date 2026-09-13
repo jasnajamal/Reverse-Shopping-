@@ -77,13 +77,51 @@
 
             <h2 class="page-title">Seller Offers</h2>
 
+            <!-- Offer Comparison Summary -->
+
+            <div class="card">
+
+                <h3>Offer Comparison</h3>
+
+                <p>
+                    <strong>Total Offers:</strong>
+                    {{ offers|length }}
+                </p>
+
+                <p>
+                    <strong>Lowest Offer:</strong>
+                    ₹{{ offers.0.offer_price }}
+                </p>
+
+                <p>
+                    Compare the seller offers below based on price,
+                    delivery, warranty and other details.
+                </p>
+
+            </div>
+
+
+            <!-- Individual Seller Offers -->
+
             {% for offer in offers %}
 
                 <div class="card">
 
                     <h2>{{ offer.product.product_name }}</h2>
 
+                    <!-- Lowest Price Indicator -->
+
+                    {% if forloop.first %}
+
+                        <p>
+                            <strong>🏆 Lowest Price</strong>
+                        </p>
+
+                    {% endif %}
+
+
                     <!-- Seller Product Image -->
+
                     {% if offer.product.productimages_set.all %}
 
                         <p>

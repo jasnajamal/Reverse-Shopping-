@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Offers - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>My Offers</h1>
+        <p>Offers submitted by {{ seller.name }}</p>
+    </div>
+
+    <div class="container">
+
+        {% for offer in offers %}
+
+            <div class="card">
+
+                <h2>{{ offer.product.product_name }}</h2>
+
+                <p>
+                    <strong>Buyer Requirement:</strong>
+                    {{ offer.requirement.product_type }}
+                </p>
+
+                <p>
+                    <strong>Offer Price:</strong>
+                    ₹{{ offer.offer_price }}
+                </p>
+
+                <p>
+                    <strong>Delivery:</strong>
+                    {{ offer.delivery_days|default:"Not specified" }} days
+                </p>
+
+                <p>
+                    <strong>Warranty:</strong>
+                    {{ offer.warranty|default:"Not specified" }}
+                </p>
+
+                <a href="/update-offer/{{ offer.id }}/">
+                    <button>Update Offer</button>
+                </a>
+
+            </div>
+
+        {% empty %}
+
+            <div class="card">
+                <p>You have not submitted any offers yet.</p>
+            </div>
+
+        {% endfor %}
+
+        <br>
+
+        <a href="/seller/">
+            <button>Back to Seller Dashboard</button>
+        </a>
+
+    </div>
+
+</body>
+</html>

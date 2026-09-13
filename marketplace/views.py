@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages
+from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages, Notifications
+from django.utils import timezone
 
 
 def home(request):
@@ -157,6 +158,25 @@ def post_requirement(request):
                 image_path=image_path
             )
 
+        # Notify matching sellers about the new requirement
+        sellers = Users.objects.filter(
+            role='seller',
+            category_id=category_id
+        )
+
+        for seller in sellers:
+            Notifications.objects.create(
+                user_id=seller.id,
+                message=(
+                    f'New buyer requirement. '
+                    f'Buyer: {buyer.name}. '
+                    f'Product: {product_type}. '
+                    f'Budget: ₹{budget_min or "Not specified"} - '
+                    f'₹{budget_max or "Not specified"}.'
+                ),
+                created_at=timezone.now()
+            )
+
         messages.success(request, 'Requirement posted successfully.')
         return redirect('/my-requirements/')
 
@@ -204,6 +224,35 @@ def seller_dashboard(request):
         {'seller': seller}
     )
 
+def selected_orders(request):
+    seller_id = request.session.get('user_id')
+
+    if not seller_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'seller':
+        return redirect('/login/')
+
+    seller = Users.objects.get(id=seller_id, role='seller')
+
+    orders = Orders.objects.filter(
+        offer__product__seller=seller
+    ).select_related(
+        'buyer',
+        'offer',
+        'offer__product',
+        'offer__requirement'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/selected_orders.html',
+        {
+            'orders': orders,
+            'seller': seller
+        }
+    )
+
 def buyer_requirements(request):
     seller_id = request.session.get('user_id')
 
@@ -228,19 +277,71 @@ def buyer_requirements(request):
             product__seller=seller
         ).first()
 
-        competing_offers = Offers.objects.filter(
+        all_offers = Offers.objects.filter(
             requirement=requirement
-        ).exclude(
-            product__seller=seller
         ).select_related(
             'product',
             'product__seller'
         ).order_by('offer_price')
 
+        competing_offers = all_offers.exclude(
+            product__seller=seller
+        )
+
+        own_position = None
+        price_difference = None
+        price_difference_label = None
+
+        lowest_offer = all_offers.first()
+        lowest_competitor = competing_offers.first()
+
+        # Check whether buyer has already selected an offer
+        selected_order = Orders.objects.filter(
+            offer__requirement=requirement
+        ).select_related(
+            'offer',
+            'offer__product',
+            'offer__product__seller'
+        ).first()
+
+        selected_offer = None
+
+        if selected_order:
+            selected_offer = selected_order.offer
+
+        if own_offer:
+            own_position = list(all_offers).index(own_offer) + 1
+
+            if lowest_competitor:
+                price_difference = (
+                    own_offer.offer_price - lowest_competitor.offer_price
+                )
+
+                if price_difference > 0:
+                    price_difference_label = (
+                        f'₹{price_difference} higher'
+                    )
+                elif price_difference < 0:
+                    price_difference_label = (
+                        f'₹{abs(price_difference)} lower'
+                    )
+                else:
+                    price_difference_label = 'Same price'
+
         requirement_data.append({
             'requirement': requirement,
             'own_offer': own_offer,
-            'competing_offers': competing_offers
+            'competing_offers': competing_offers,
+            'all_offers': all_offers,
+            'lowest_offer': lowest_offer,
+            'lowest_competitor': lowest_competitor,
+            'own_position': own_position,
+            'price_difference': price_difference,
+            'price_difference_label': price_difference_label,
+
+            # New selected-offer information
+            'selected_order': selected_order,
+            'selected_offer': selected_offer,
         })
 
     return render(
@@ -325,6 +426,17 @@ def submit_offer(request, requirement_id):
             message=message or None
         )
 
+        Notifications.objects.create(
+            user_id=requirement.buyer_id,
+            message=(
+                f'New offer received for your {requirement.product_type} requirement. '
+                f'Seller: {seller.name}. '
+                f'Product: {product.product_name}. '
+                f'Offer Price: ₹{offer_price}. '
+                f'Delivery: {delivery_days or "Not specified"} days.'
+            )
+        )
+
         messages.success(request, 'Offer submitted successfully.')
         return redirect('/buyer-requirements/')
 
@@ -366,6 +478,18 @@ def update_offer(request, offer_id):
         offer.message = request.POST.get('message') or None
         offer.save()
 
+        Notifications.objects.create(
+            user_id=offer.requirement.buyer_id,
+            message=(
+                f'Offer updated. '
+                f'Seller: {seller.name}. '
+                f'Product: {product.product_name}. '
+                f'New Offer Price: ₹{offer.offer_price}. '
+                f'Delivery: {offer.delivery_days or "Not specified"} days.'
+            ),
+            created_at=timezone.now()
+        )
+
         messages.success(request, 'Offer updated successfully.')
         return redirect('/buyer-requirements/')
 
@@ -377,7 +501,6 @@ def update_offer(request, offer_id):
             'product': product
         }
     )
-
 
 def view_offers(request, requirement_id):
     buyer_id = request.session.get('user_id')
@@ -433,18 +556,30 @@ def select_offer(request, offer_id):
         requirement__buyer_id=buyer_id
     )
 
-    # Prevent selecting the same requirement again
     if Orders.objects.filter(
         buyer_id=buyer_id,
         offer__requirement=offer.requirement
     ).exists():
-        messages.info(request, 'You have already selected an offer for this requirement.')
+        messages.info(
+            request,
+            'You have already selected an offer for this requirement.'
+        )
         return redirect(f'/view-offers/{offer.requirement.id}/')
 
     Orders.objects.create(
         buyer_id=buyer_id,
         offer=offer,
-        order_status='pending'
+        order_status='pending',
+        order_date=timezone.now()
+    )
+
+    Notifications.objects.create(
+        user_id=offer.product.seller_id,
+        message=(
+            f'Your offer for {offer.requirement.product_type} '
+            f'has been selected by the buyer.'
+        ),
+        created_at=timezone.now()
     )
 
     messages.success(
@@ -453,7 +588,7 @@ def select_offer(request, offer_id):
     )
 
     return redirect(f'/view-offers/{offer.requirement.id}/')
-
+    
 def my_offers(request):
     seller_id = request.session.get('user_id')
 
@@ -463,19 +598,78 @@ def my_offers(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
+    seller = Users.objects.get(id=seller_id, role='seller')
+
     offers = Offers.objects.filter(
-        product__seller_id=seller_id
+        product__seller=seller
     ).select_related(
         'product',
-        'requirement'
+        'requirement',
+        'requirement__buyer'
     ).order_by('-id')
 
     return render(
         request,
         'marketplace/my_offers.html',
-        {'offers': offers}
+        {
+            'offers': offers,
+            'seller': seller
+        }
     )
 
 def logout_view(request):
     request.session.flush()
     return redirect('/login/')
+
+def profile(request):
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return redirect('/login/')
+
+    user = Users.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        user.name = request.POST.get('name')
+        user.email = request.POST.get('email')
+
+        if user.role == 'seller':
+            category_id = request.POST.get('category_id')
+            user.category_id = category_id
+
+        user.save()
+
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('/profile/')
+
+    categories = Categories.objects.all()
+
+    return render(
+        request,
+        'marketplace/profile.html',
+        {
+            'user': user,
+            'categories': categories
+        }
+    )
+
+def notifications(request):
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return redirect('/login/')
+
+    user_notifications = Notifications.objects.filter(
+        user_id=user_id
+    ).order_by('-id')
+
+    Notifications.objects.filter(
+        user_id=user_id,
+        is_read=False
+    ).update(is_read=True)
+
+    return render(
+        request,
+        'marketplace/notifications.html',
+        {'notifications': user_notifications}
+    )

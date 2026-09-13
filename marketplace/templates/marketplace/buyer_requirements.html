@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +27,11 @@
                 <div class="card">
 
                     <h2>{{ item.requirement.product_type }}</h2>
+
+                    <p>
+                        <strong>Buyer:</strong>
+                        {{ item.requirement.buyer.name }}
+                    </p>
 
                     <p>
                         <strong>Category:</strong>
@@ -77,6 +83,58 @@
                         {{ item.requirement.required_by|default:"Not specified" }}
                     </p>
 
+
+                    <!-- BUYER SELECTION STATUS -->
+
+                    {% if item.selected_order %}
+
+                        <hr>
+
+                        <h3>Buyer Selection Status</h3>
+
+                        <p>
+                            <strong>Buyer:</strong>
+                            {{ item.requirement.buyer.name }}
+                        </p>
+
+                        {% if item.selected_offer.product.seller.id == seller.id %}
+
+                            <p>
+                                <strong>✅ Your offer was selected.</strong>
+                            </p>
+
+                            <p>
+                                <strong>Order Status:</strong>
+                                {{ item.selected_order.order_status }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                <strong>❌ Your offer was not selected.</strong>
+                            </p>
+
+                            <p>
+                                Buyer selected another seller's offer.
+                            </p>
+
+                        {% endif %}
+
+                        <p>
+                            <strong>Selected Seller:</strong>
+                            {{ item.selected_offer.product.seller.name }}
+                        </p>
+
+                        <p>
+                            <strong>Selected Offer Price:</strong>
+                            ₹{{ item.selected_offer.offer_price }}
+                        </p>
+
+                    {% endif %}
+
+
+                    <!-- YOUR OFFER -->
+
                     <hr>
 
                     {% if item.own_offer %}
@@ -88,31 +146,109 @@
                             ₹{{ item.own_offer.offer_price }}
                         </p>
 
-                        <a href="/update-offer/{{ item.own_offer.id }}/">
-                            <button>Update Offer</button>
-                        </a>
+                        <p>
+                            <strong>Delivery:</strong>
+                            {{ item.own_offer.delivery_days|default:"Not specified" }}
+                            days
+                        </p>
+
+                        <p>
+                            <strong>Position:</strong>
+                            {{ item.own_position }}{% if item.own_position == 1 %}st{% elif item.own_position == 2 %}nd{% elif item.own_position == 3 %}rd{% else %}th{% endif %}
+                        </p>
+
+                        {% if item.lowest_competitor %}
+
+                            <p>
+                                <strong>Lowest Competitor:</strong>
+                                ₹{{ item.lowest_competitor.offer_price }}
+                            </p>
+
+                            <p>
+                                <strong>Difference:</strong>
+                                {{ item.price_difference_label }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                <strong>Lowest Competitor:</strong>
+                                No competing offer yet
+                            </p>
+
+                        {% endif %}
+
+
+                        {% if item.selected_order %}
+
+                            {% if item.selected_offer.product.seller.id == seller.id %}
+
+                                <p>
+                                    <strong>✅ Selected Offer</strong>
+                                </p>
+
+                            {% else %}
+
+                                <p>
+                                    <strong>❌ Offer Not Selected</strong>
+                                </p>
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <a href="/update-offer/{{ item.own_offer.id }}/">
+                                <button>Update Offer</button>
+                            </a>
+
+                        {% endif %}
+
 
                     {% else %}
 
-                        <a href="/submit-offer/{{ item.requirement.id }}/">
-                            <button>Submit Offer</button>
-                        </a>
+                        <h3>You have not submitted an offer</h3>
+
+                        {% if item.selected_order %}
+
+                            <p>
+                                Buyer has already selected another seller's offer.
+                            </p>
+
+                        {% else %}
+
+                            <a href="/submit-offer/{{ item.requirement.id }}/">
+                                <button>Submit Offer</button>
+                            </a>
+
+                        {% endif %}
 
                     {% endif %}
 
-                    {% if item.competing_offers %}
 
-                        <hr>
+                    <!-- SELLER COMPETITION -->
 
-                        <h3>Competing Sellers</h3>
+                    <hr>
 
-                        {% for offer in item.competing_offers %}
+                    <h3>Seller Competition & Comparison</h3>
+
+                    {% if item.all_offers %}
+
+                        <p>
+                            <strong>Lowest Offer:</strong>
+                            ₹{{ item.lowest_offer.offer_price }}
+                        </p>
+
+                        {% for offer in item.all_offers %}
 
                             <div class="card">
 
                                 <p>
                                     <strong>Seller:</strong>
                                     {{ offer.product.seller.name }}
+
+                                    {% if offer.product.seller.id == seller.id %}
+                                        <strong>(You)</strong>
+                                    {% endif %}
                                 </p>
 
                                 <p>
@@ -126,13 +262,39 @@
                                     days
                                 </p>
 
+                                {% if item.selected_offer and item.selected_offer.id == offer.id %}
+
+                                    <p>
+                                        <strong>✅ Selected by Buyer</strong>
+                                    </p>
+
+                                {% elif item.selected_order %}
+
+                                    <p>
+                                        Offer not selected.
+                                    </p>
+
+                                {% elif offer.product.seller.id == seller.id %}
+
+                                    <p>
+                                        <strong>Your Offer</strong>
+                                    </p>
+
+                                {% else %}
+
+                                    <p>
+                                        <strong>Competitor Offer</strong>
+                                    </p>
+
+                                {% endif %}
+
                             </div>
 
                         {% endfor %}
 
                     {% else %}
 
-                        <p>No other seller offers yet.</p>
+                        <p>No seller offers yet.</p>
 
                     {% endif %}
 
@@ -157,4 +319,5 @@
     </div>
 
 </body>
+
 </html>

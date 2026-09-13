@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+
+    <style>
+        .message-popup {
+            padding: 12px 18px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message-popup.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message-popup.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>My Profile</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-popup {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Name:</label><br>
+        <input type="text" name="name" value="{{ user.name }}" required>
+        <br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" value="{{ user.email }}" required>
+        <br><br>
+
+        {% if user.role == 'seller' %}
+            <label>Selling Category:</label><br>
+
+            <select name="category_id" required>
+                <option value="">Select Category</option>
+
+                {% for category in categories %}
+                    <option value="{{ category.id }}"
+                        {% if user.category_id == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+
+            </select>
+
+            <br><br>
+        {% endif %}
+
+        <button type="submit">Update Profile</button>
+    </form>
+
+    <br>
+
+    {% if user.role == 'buyer' %}
+        <a href="/buyer/">Back to Dashboard</a>
+    {% elif user.role == 'seller' %}
+        <a href="/seller/">Back to Dashboard</a>
+    {% endif %}
+
+</body>
+
+</html>

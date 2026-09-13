@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Selected Orders - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>Selected Orders</h1>
+        <p>Orders received from buyers</p>
+    </div>
+
+    <div class="container">
+
+        {% if orders %}
+
+            {% for order in orders %}
+
+                <div class="card">
+
+                    <h2>{{ order.offer.product.product_name }}</h2>
+
+                    <p>
+                        <strong>Buyer:</strong>
+                        {{ order.buyer.name }}
+                    </p>
+
+                    <p>
+                        <strong>Product:</strong>
+                        {{ order.offer.product.product_name }}
+                    </p>
+
+                    <p>
+                        <strong>Offer Price:</strong>
+                        ₹{{ order.offer.offer_price }}
+                    </p>
+
+                    <p>
+                        <strong>Delivery:</strong>
+                        {{ order.offer.delivery_days|default:"Not specified" }}
+                        days
+                    </p>
+
+                    <p>
+                        <strong>Warranty:</strong>
+                        {{ order.offer.warranty|default:"Not specified" }}
+                    </p>
+
+                    <p>
+                        <strong>Order Status:</strong>
+                        {{ order.order_status }}
+                    </p>
+
+                    <p>
+                        <strong>Order Date:</strong>
+                        {{ order.order_date|default:"Not specified" }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="card">
+
+                <h2>No Selected Orders</h2>
+
+                <p>
+                    No buyer has selected your offer yet.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+        <br>
+
+        <a href="/seller/">
+            <button>Back to Seller Dashboard</button>
+        </a>
+
+    </div>
+
+</body>
+
+</html>

@@ -15,6 +15,9 @@ urlpatterns = [
     path('view-offers/<int:requirement_id>/', views.view_offers, name='view_offers'),
     path('select-offer/<int:offer_id>/', views.select_offer, name='select_offer'),
     path('my-offers/', views.my_offers, name='my_offers'),
+    path('profile/', views.profile, name='profile'),
+    path('notifications/', views.notifications, name='notifications'),
     path('logout/', views.logout_view, name='logout'),
+    path('selected-orders/', views.selected_orders, name='selected_orders'),
 
 ]

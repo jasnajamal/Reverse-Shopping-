@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications - Reverse Shopping</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>Notifications 🔔</h1>
+        <p>Your latest updates</p>
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+
+            {% if notifications %}
+
+                {% for notification in notifications %}
+
+                    <div class="notification">
+
+                        <p>
+                            {{ notification.message }}
+                        </p>
+
+                        <small>
+                            {{ notification.created_at|date:"d M Y, h:i A" }}
+                        </small>
+
+                    </div>
+
+                    <hr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No notifications yet.</p>
+
+            {% endif %}
+
+            <br>
+
+            {% if request.session.user_role == 'buyer' %}
+
+                <a href="/buyer/">
+                    <button>Back to Dashboard</button>
+                </a>
+
+            {% elif request.session.user_role == 'seller' %}
+
+                <a href="/seller/">
+                    <button>Back to Dashboard</button>
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
