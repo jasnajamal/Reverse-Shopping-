@@ -29,7 +29,6 @@ def login_view(request):
             if password_valid:
                 request.session['user_id'] = user.id
                 request.session['user_role'] = user.role
-
                 if user.role == 'buyer':
                     return redirect('/buyer/')
                 elif user.role == 'seller':
@@ -133,7 +132,7 @@ def post_requirement(request):
         condition_type = request.POST.get('condition_type')
         additional_requirements = request.POST.get('additional_requirements')
         required_by = request.POST.get('required_by')
-        image = request.FILES.get('image')
+        images = request.FILES.getlist('image')
 
         requirement = Requirements.objects.create(
             buyer=buyer,
@@ -147,7 +146,7 @@ def post_requirement(request):
             required_by=required_by or None
         )
 
-        if image:
+        for image in images:
             image_path = default_storage.save(
                 f'requirement_images/{image.name}',
                 image
@@ -390,8 +389,8 @@ def submit_offer(request, requirement_id):
         warranty = request.POST.get('warranty')
         message = request.POST.get('message')
 
-        # Get uploaded product image
-        product_image = request.FILES.get('product_image')
+        # Get uploaded product images
+        product_images = request.FILES.getlist('product_image')
 
         # Create product
         product = Products.objects.create(
@@ -404,8 +403,8 @@ def submit_offer(request, requirement_id):
             brand=brand or None
         )
 
-        # Save product image
-        if product_image:
+        # Save product images
+        for product_image in product_images:
             image_path = default_storage.save(
                 f'product_images/{product_image.name}',
                 product_image
@@ -471,6 +470,20 @@ def update_offer(request, offer_id):
         product.condition_type = request.POST.get('condition_type')
         product.brand = request.POST.get('brand') or None
         product.save()
+
+        # Add new product images
+        new_product_images = request.FILES.getlist('product_images')
+
+        for product_image in new_product_images:
+            image_path = default_storage.save(
+                f'product_images/{product_image.name}',
+                product_image
+            )
+
+            ProductImages.objects.create(
+                product=product,
+                image_path=image_path
+            )
 
         offer.offer_price = request.POST.get('offer_price')
         offer.delivery_days = request.POST.get('delivery_days') or None

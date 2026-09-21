@@ -6,66 +6,1277 @@
 
     <title>My Offers - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 6% 10%, rgba(212,175,55,.08), transparent 22%),
+                #f8f5ed;
+            color: #191917;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .mo-navbar {
+            min-height: 78px;
+            padding: 14px clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255,255,255,.97);
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .mo-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #111;
+        }
+
+        .mo-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .mo-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .mo-brand-text strong {
+            font-size: 15px;
+        }
+
+        .mo-brand-text small {
+            color: #928b7e;
+
+            font-size: 8px;
+            font-weight: 700;
+
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .mo-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .mo-account {
+            color: #716b60;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .mo-account::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            display: inline-block;
+
+            margin-right: 8px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            box-shadow:
+                0 0 0 4px rgba(212,175,55,.13);
+        }
+
+        .mo-dashboard-link {
+            padding: 9px 16px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            color: #28251f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: .2s ease;
+        }
+
+        .mo-dashboard-link:hover {
+            background: #111;
+            border-color: #111;
+            color: #d4af37;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .mo-hero {
+            position: relative;
+
+            min-height: 365px;
+
+            padding: 58px clamp(30px,8vw,125px);
+
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+
+            gap: 60px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 82% 24%,
+                    rgba(212,175,55,.14),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c,
+                    #151512 58%,
+                    #1c1a13
+                );
+
+            color: #fff;
+        }
+
+        .mo-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 390px;
+            height: 390px;
+
+            right: -170px;
+            top: -230px;
+
+            border: 1px solid rgba(212,175,55,.13);
+            border-radius: 50%;
+        }
+
+        .mo-hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 680px;
+        }
+
+        .mo-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #dfc66f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2.2px;
+        }
+
+        .mo-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .mo-hero h1 {
+            margin: 17px 0 18px;
+
+            font-family: Georgia, serif;
+
+            font-size: clamp(45px,5vw,65px);
+            font-weight: 500;
+
+            line-height: 1;
+
+            letter-spacing: -2px;
+        }
+
+        .mo-hero h1 span {
+            color: #dfc66f;
+            font-style: italic;
+        }
+
+        .mo-hero p {
+            max-width: 570px;
+
+            margin: 0;
+
+            color: #bcb8ae;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+        /* =========================
+           HERO VISUAL
+        ========================= */
+
+        .mo-hero-visual {
+            position: relative;
+            z-index: 2;
+
+            width: 255px;
+            height: 220px;
+        }
+
+        .mo-orbit {
+            position: absolute;
+
+            width: 210px;
+            height: 210px;
+
+            right: 0;
+            top: 0;
+
+            border: 1px solid rgba(212,175,55,.18);
+            border-radius: 50%;
+        }
+
+        .mo-visual-card {
+            position: absolute;
+
+            width: 200px;
+
+            left: 0;
+            top: 34px;
+
+            padding: 21px;
+
+            border: 1px solid rgba(212,175,55,.27);
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #24231e,
+                    #151512
+                );
+
+            box-shadow:
+                0 25px 55px rgba(0,0,0,.35);
+        }
+
+        .mo-visual-label {
+            color: #a98b32;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .mo-visual-price {
+            margin: 12px 0 16px;
+
+            color: #fff;
+
+            font-family: Georgia, serif;
+
+            font-size: 29px;
+            font-weight: 500;
+        }
+
+        .mo-visual-line {
+            height: 1px;
+
+            margin-bottom: 15px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(212,175,55,.5),
+                    transparent
+                );
+        }
+
+        .mo-visual-row {
+            margin-top: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            color: #8e897f;
+
+            font-size: 8px;
+        }
+
+        .mo-visual-row strong {
+            color: #d6d1c6;
+            font-size: 8px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .mo-main {
+            width: min(1180px,90%);
+
+            margin: 0 auto;
+
+            padding: 68px 0 80px;
+        }
+
+        .mo-section-header {
+            margin-bottom: 31px;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+        }
+
+        .mo-section-label {
+            color: #967616;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.9px;
+        }
+
+        .mo-section-header h2 {
+            margin: 8px 0 7px;
+
+            font-family: Georgia, serif;
+
+            font-size: clamp(30px,3vw,40px);
+            font-weight: 500;
+
+            letter-spacing: -1px;
+        }
+
+        .mo-section-header p {
+            margin: 0;
+
+            color: #797267;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        .mo-seller-chip {
+            flex-shrink: 0;
+
+            padding: 9px 13px;
+
+            border: 1px solid #ddd3bf;
+            border-radius: 30px;
+
+            background: #fff;
+
+            color: #665e50;
+
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .mo-seller-chip::before {
+            content: "";
+
+            width: 6px;
+            height: 6px;
+
+            display: inline-block;
+
+            margin-right: 7px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+        }
+
+        /* =========================
+           OFFERS GRID
+        ========================= */
+
+        .mo-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2,minmax(0,1fr));
+
+            gap: 22px;
+        }
+
+        .mo-card {
+            position: relative;
+
+            overflow: hidden;
+
+            border: 1px solid #e2dacb;
+            border-radius: 16px;
+
+            background: #fff;
+
+            box-shadow:
+                0 14px 42px rgba(35,30,20,.05);
+
+            transition:
+                transform .22s ease,
+                box-shadow .22s ease,
+                border-color .22s ease;
+        }
+
+        .mo-card:hover {
+            transform: translateY(-4px);
+
+            border-color: #d8cba7;
+
+            box-shadow:
+                0 20px 50px rgba(35,30,20,.09);
+        }
+
+        .mo-card-top {
+            padding: 25px 27px;
+
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            background: #171715;
+
+            color: #fff;
+        }
+
+        .mo-card-eyebrow {
+            color: #a98b32;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .mo-card-top h3 {
+            margin: 7px 0 0;
+
+            font-family: Georgia, serif;
+
+            font-size: 23px;
+            font-weight: 500;
+
+            line-height: 1.25;
+        }
+
+        .mo-card-number {
+            min-width: 36px;
+            height: 36px;
+
+            padding: 0 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #4c452f;
+            border-radius: 50%;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 12px;
+        }
+
+        /* =========================
+           CARD BODY
+        ========================= */
+
+        .mo-card-body {
+            padding: 26px 27px 27px;
+        }
+
+        .mo-requirement {
+            margin-bottom: 19px;
+
+            padding: 14px 16px;
+
+            border-left: 3px solid #d4af37;
+
+            background: #faf7ef;
+        }
+
+        .mo-detail-label {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #989082;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.1px;
+
+            text-transform: uppercase;
+        }
+
+        .mo-requirement strong {
+            color: #39352e;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+        .mo-offer-info {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2,minmax(0,1fr));
+
+            gap: 11px;
+        }
+
+        .mo-info-item {
+            min-height: 86px;
+
+            padding: 15px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            gap: 6px;
+
+            border: 1px solid #ebe4d9;
+            border-radius: 9px;
+
+            background: #fcfbf8;
+        }
+
+        .mo-info-item strong {
+            color: #302d27;
+
+            font-size: 12px;
+
+            line-height: 1.4;
+        }
+
+        .mo-price-box {
+            border-color: #dfcc8c;
+
+            background: #f8f1dc;
+        }
+
+        .mo-price-box .mo-detail-label {
+            color: #806d32;
+        }
+
+        .mo-price {
+            color: #72570c !important;
+
+            font-family: Georgia, serif;
+
+            font-size: 23px !important;
+            font-weight: 500 !important;
+        }
+
+        .mo-warranty {
+            grid-column: 1 / -1;
+        }
+
+        /* =========================
+           ACTION
+        ========================= */
+
+        .mo-card-action {
+            margin-top: 20px;
+
+            padding-top: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            border-top: 1px solid #eee8dd;
+        }
+
+        .mo-action-note {
+            color: #918a7e;
+
+            font-size: 9px;
+
+            line-height: 1.5;
+        }
+
+        .mo-update-btn {
+            min-height: 42px;
+
+            padding: 10px 16px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 20px;
+
+            flex-shrink: 0;
+
+            border-radius: 8px;
+
+            background: #111;
+
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            transition: .2s ease;
+        }
+
+        .mo-update-btn span {
+            font-size: 15px;
+        }
+
+        .mo-update-btn:hover {
+            transform: translateY(-2px);
+
+            background: #d4af37;
+            color: #111;
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .mo-empty {
+            padding: 75px 30px;
+
+            text-align: center;
+
+            border: 1px solid #e2dacb;
+            border-radius: 17px;
+
+            background: #fff;
+
+            box-shadow:
+                0 14px 42px rgba(35,30,20,.045);
+        }
+
+        .mo-empty-icon {
+            width: 58px;
+            height: 58px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #171715;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 22px;
+        }
+
+        .mo-empty h3 {
+            margin: 0 0 8px;
+
+            font-family: Georgia, serif;
+
+            font-size: 25px;
+            font-weight: 500;
+        }
+
+        .mo-empty p {
+            max-width: 440px;
+
+            margin: 0 auto 20px;
+
+            color: #817a6e;
+
+            font-size: 11px;
+
+            line-height: 1.7;
+        }
+
+        .mo-explore-btn {
+            min-height: 43px;
+
+            padding: 10px 17px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 20px;
+
+            border-radius: 8px;
+
+            background: #111;
+
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        /* =========================
+           BACK
+        ========================= */
+
+        .mo-back-wrapper {
+            margin-top: 35px;
+        }
+
+        .mo-back {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #3e3931;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .mo-back span {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #111;
+
+            color: #d4af37;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .mo-footer {
+            padding:
+                27px
+                clamp(24px,6vw,95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            border-top: 1px solid #e7e0d2;
+
+            background: #fff;
+        }
+
+        .mo-footer-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .mo-footer-logo {
+            width: 33px;
+            height: 33px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .mo-footer-brand strong {
+            font-size: 12px;
+        }
+
+        .mo-footer p,
+        .mo-footer > span {
+            margin: 0;
+
+            color: #817b70;
+
+            font-size: 9px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 850px) {
+            .mo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mo-hero-visual {
+                display: none;
+            }
+
+            .mo-hero {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .mo-navbar {
+                padding: 12px 5%;
+            }
+
+            .mo-account {
+                display: none;
+            }
+
+            .mo-brand-text small {
+                display: none;
+            }
+
+            .mo-hero {
+                min-height: 320px;
+                padding: 48px 6%;
+            }
+
+            .mo-hero h1 {
+                font-size: 43px;
+            }
+
+            .mo-main {
+                width: 92%;
+                padding: 48px 0 60px;
+            }
+
+            .mo-section-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .mo-card-top,
+            .mo-card-body {
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+
+            .mo-card-action {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .mo-update-btn {
+                width: 100%;
+            }
+
+            .mo-footer {
+                padding: 25px 6%;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .mo-dashboard-link {
+                padding: 8px 10px;
+            }
+
+            .mo-brand-text strong {
+                font-size: 13px;
+            }
+
+            .mo-offer-info {
+                grid-template-columns: 1fr;
+            }
+
+            .mo-warranty {
+                grid-column: auto;
+            }
+        }
+    </style>
 </head>
 
-<body>
 
-    <div class="top-bar">
-        <h1>My Offers</h1>
-        <p>Offers submitted by {{ seller.name }}</p>
-    </div>
+<body class="seller-offers-page">
 
-    <div class="container">
+    <!-- NAVBAR -->
+    <nav class="mo-navbar">
 
-        {% for offer in offers %}
+        <a href="/" class="mo-brand">
 
-            <div class="card">
+            <span class="mo-logo">
+                R
+            </span>
 
-                <h2>{{ offer.product.product_name }}</h2>
+            <span class="mo-brand-text">
+                <strong>Reverse Shopping</strong>
+                <small>Seller Workspace</small>
+            </span>
 
-                <p>
-                    <strong>Buyer Requirement:</strong>
-                    {{ offer.requirement.product_type }}
-                </p>
-
-                <p>
-                    <strong>Offer Price:</strong>
-                    ₹{{ offer.offer_price }}
-                </p>
-
-                <p>
-                    <strong>Delivery:</strong>
-                    {{ offer.delivery_days|default:"Not specified" }} days
-                </p>
-
-                <p>
-                    <strong>Warranty:</strong>
-                    {{ offer.warranty|default:"Not specified" }}
-                </p>
-
-                <a href="/update-offer/{{ offer.id }}/">
-                    <button>Update Offer</button>
-                </a>
-
-            </div>
-
-        {% empty %}
-
-            <div class="card">
-                <p>You have not submitted any offers yet.</p>
-            </div>
-
-        {% endfor %}
-
-        <br>
-
-        <a href="/seller/">
-            <button>Back to Seller Dashboard</button>
         </a>
 
-    </div>
+
+        <div class="mo-nav-actions">
+
+            <span class="mo-account">
+                Seller Account
+            </span>
+
+            <a
+                href="/seller/"
+                class="mo-dashboard-link"
+            >
+                Dashboard
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="mo-hero">
+
+        <div class="mo-hero-content">
+
+            <span class="mo-eyebrow">
+                SELLER WORKSPACE
+            </span>
+
+            <h1>
+                Your submitted<br>
+                <span>offers.</span>
+            </h1>
+
+            <p>
+                Review the offers you have submitted,
+                track their product details and update your
+                pricing whenever required.
+            </p>
+
+        </div>
+
+
+        <div class="mo-hero-visual">
+
+            <div class="mo-orbit"></div>
+
+            <div class="mo-visual-card">
+
+                <span class="mo-visual-label">
+                    SELLER OFFER
+                </span>
+
+                <div class="mo-visual-price">
+                    ₹ Offer
+                </div>
+
+                <div class="mo-visual-line"></div>
+
+                <div class="mo-visual-row">
+                    <span>PRODUCT</span>
+                    <strong>Ready</strong>
+                </div>
+
+                <div class="mo-visual-row">
+                    <span>DELIVERY</span>
+                    <strong>Set</strong>
+                </div>
+
+                <div class="mo-visual-row">
+                    <span>STATUS</span>
+                    <strong>Submitted</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="mo-main">
+
+        <div class="mo-section-header">
+
+            <div>
+
+                <span class="mo-section-label">
+                    OFFER MANAGEMENT
+                </span>
+
+                <h2>
+                    My Offers
+                </h2>
+
+                <p>
+                    View and manage the offers you have submitted
+                    to buyer requirements.
+                </p>
+
+            </div>
+
+
+            <div class="mo-seller-chip">
+                {{ seller.name }}
+            </div>
+
+        </div>
+
+
+        <!-- OFFERS -->
+        {% if offers %}
+
+        <section class="mo-grid">
+
+            {% for offer in offers %}
+
+            <article class="mo-card">
+
+                <!-- CARD HEADER -->
+                <div class="mo-card-top">
+
+                    <div>
+
+                        <span class="mo-card-eyebrow">
+                            SUBMITTED OFFER
+                        </span>
+
+                        <h3>
+                            {{ offer.product.product_name }}
+                        </h3>
+
+                    </div>
+
+
+                    <span class="mo-card-number">
+                        {{ forloop.counter|stringformat:"02d" }}
+                    </span>
+
+                </div>
+
+
+                <!-- CARD BODY -->
+                <div class="mo-card-body">
+
+
+                    <!-- REQUIREMENT -->
+                    <div class="mo-requirement">
+
+                        <span class="mo-detail-label">
+                            Buyer Requirement
+                        </span>
+
+                        <strong>
+                            {{ offer.requirement.product_type }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- OFFER INFO -->
+                    <div class="mo-offer-info">
+
+
+                        <div class="mo-info-item mo-price-box">
+
+                            <span class="mo-detail-label">
+                                Offer Price
+                            </span>
+
+                            <strong class="mo-price">
+                                ₹{{ offer.offer_price }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="mo-info-item">
+
+                            <span class="mo-detail-label">
+                                Delivery
+                            </span>
+
+                            <strong>
+                                {{ offer.delivery_days|default:"Not specified" }}
+                                days
+                            </strong>
+
+                        </div>
+
+
+                        <div class="mo-info-item mo-warranty">
+
+                            <span class="mo-detail-label">
+                                Warranty
+                            </span>
+
+                            <strong>
+                                {{ offer.warranty|default:"Not specified" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTION -->
+                    <div class="mo-card-action">
+
+                        <span class="mo-action-note">
+                            Need to change your price or product details?
+                        </span>
+
+                        <a
+                            href="/update-offer/{{ offer.id }}/"
+                            class="mo-update-btn"
+                        >
+                            Update Offer
+                            <span>→</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+        <section class="mo-empty">
+
+            <div class="mo-empty-icon">
+                ⇄
+            </div>
+
+            <h3>
+                No offers submitted yet
+            </h3>
+
+            <p>
+                Explore available buyer requirements and submit
+                your first competitive offer.
+            </p>
+
+            <a
+                href="/buyer-requirements/"
+                class="mo-explore-btn"
+            >
+                Explore Buyer Requirements →
+            </a>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- BACK -->
+        <div class="mo-back-wrapper">
+
+            <a
+                href="/seller/"
+                class="mo-back"
+            >
+                <span>←</span>
+                Back to Seller Dashboard
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="mo-footer">
+
+        <div class="mo-footer-brand">
+
+            <span class="mo-footer-logo">
+                R
+            </span>
+
+            <strong>
+                Reverse Shopping
+            </strong>
+
+        </div>
+
+
+        <p>
+            Compete with better offers.
+        </p>
+
+
+        <span>
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
 </html>

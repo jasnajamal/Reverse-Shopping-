@@ -1,56 +1,979 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Login - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            background: #f8f5ed;
+            color: #191917;
+
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        input,
+        button {
+            font: inherit;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .login-navbar {
+            min-height: 78px;
+
+            padding: 14px clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255, 255, 255, 0.97);
+
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .login-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            color: #111111;
+        }
+
+        .login-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .login-brand-copy {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .login-brand-copy strong {
+            font-size: 15px;
+        }
+
+        .login-brand-copy small {
+            color: #928b7e;
+
+            font-size: 8px;
+            font-weight: 700;
+
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .home-link {
+            padding: 9px 16px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            color: #28251f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .home-link:hover {
+            background: #111111;
+            border-color: #111111;
+
+            color: #d4af37;
+        }
+
+        /* ================= PAGE ================= */
+
+        .login-page {
+            position: relative;
+
+            min-height: calc(100vh - 78px);
+
+            padding: 60px clamp(30px, 8vw, 125px);
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(400px, 500px);
+
+            align-items: center;
+
+            gap: clamp(60px, 9vw, 130px);
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 78% 20%,
+                    rgba(212, 175, 55, 0.13),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c,
+                    #151512 58%,
+                    #1c1a13
+                );
+        }
+
+        .login-page::before {
+            content: "";
+
+            position: absolute;
+
+            width: 520px;
+            height: 520px;
+
+            right: -250px;
+            top: -270px;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.11);
+
+            border-radius: 50%;
+        }
+
+        .login-page::after {
+            content: "";
+
+            position: absolute;
+
+            width: 290px;
+            height: 290px;
+
+            left: -170px;
+            bottom: -170px;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.07);
+
+            border-radius: 50%;
+        }
+
+        /* ================= LEFT SIDE ================= */
+
+        .login-intro {
+            position: relative;
+            z-index: 2;
+
+            max-width: 660px;
+        }
+
+        .login-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #dfc66f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2.2px;
+        }
+
+        .login-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .login-intro h1 {
+            margin: 19px 0 21px;
+
+            color: #ffffff;
+
+            font-family: Georgia, serif;
+
+            font-size: clamp(52px, 6vw, 76px);
+            font-weight: 500;
+
+            line-height: 0.98;
+            letter-spacing: -3px;
+        }
+
+        .login-intro h1 span {
+            color: #dfc66f;
+
+            font-style: italic;
+        }
+
+        .login-intro > p {
+            max-width: 570px;
+
+            margin: 0;
+
+            color: #b5b1a8;
+
+            font-size: 14px;
+
+            line-height: 1.85;
+        }
+
+        /* ================= STEPS ================= */
+
+        .login-flow {
+            margin-top: 37px;
+
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 11px;
+        }
+
+        .login-flow-item {
+            min-width: 125px;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.14);
+
+            border-radius: 9px;
+
+            background:
+                rgba(255, 255, 255, 0.025);
+        }
+
+        .login-flow-item span {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #8c783b;
+
+            font-family: Georgia, serif;
+            font-size: 11px;
+        }
+
+        .login-flow-item strong {
+            color: #a9a59d;
+
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        /* ================= LOGIN CARD ================= */
+
+        .login-card-wrapper {
+            position: relative;
+            z-index: 3;
+        }
+
+        .login-card {
+            overflow: hidden;
+
+            border: 1px solid #ded6c7;
+            border-radius: 18px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 35px 90px
+                rgba(0, 0, 0, 0.35);
+        }
+
+        .login-card-header {
+            padding: 27px 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            border-bottom: 1px solid #ece5da;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #fbf8ef
+                );
+        }
+
+        .login-card-header small {
+            display: block;
+
+            margin-bottom: 6px;
+
+            color: #967616;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .login-card-header h2 {
+            margin: 0;
+
+            color: #1d1b17;
+
+            font-family: Georgia, serif;
+
+            font-size: 27px;
+            font-weight: 500;
+        }
+
+        .login-card-icon {
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #171715;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+        }
+
+        /* ================= MESSAGES ================= */
+
+        .login-messages {
+            padding: 20px 30px 0;
+        }
+
+        .login-message {
+            margin: 0 0 9px;
+
+            padding: 12px 14px;
+
+            border: 1px solid #e1d5b3;
+            border-left: 3px solid #d4af37;
+            border-radius: 8px;
+
+            background: #faf7ed;
+
+            color: #675a32;
+
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        /* ================= FORM ================= */
+
+        .login-form {
+            padding: 29px 30px 30px;
+        }
+
+        .login-form-group {
+            margin-bottom: 19px;
+        }
+
+        .login-form-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #4d483f;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .login-input-wrap {
+            position: relative;
+        }
+
+        .login-input-wrap input {
+            width: 100%;
+            min-height: 51px;
+
+            padding: 0 45px 0 14px;
+
+            outline: none;
+
+            border: 1px solid #ddd6c9;
+            border-radius: 9px;
+
+            background: #fcfbf8;
+
+            color: #24221e;
+
+            font-size: 12px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .login-input-wrap input:focus {
+            border-color: #c3a13a;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(212, 175, 55, 0.11);
+        }
+
+        .field-symbol {
+            position: absolute;
+
+            right: 14px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #a88b34;
+
+            font-family: Georgia, serif;
+            font-size: 14px;
+
+            pointer-events: none;
+        }
+
+        .login-help {
+            display: block;
+
+            margin-top: 6px;
+
+            color: #9b9488;
+
+            font-size: 8px;
+        }
+
+        /* ================= LOGIN BUTTON ================= */
+
+        .login-submit {
+            width: 100%;
+            min-height: 50px;
+
+            margin-top: 7px;
+            padding: 12px 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 25px;
+
+            border: 1px solid #111111;
+            border-radius: 8px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .login-submit span {
+            font-size: 17px;
+        }
+
+        .login-submit:hover {
+            transform: translateY(-2px);
+
+            border-color: #d4af37;
+
+            background: #d4af37;
+            color: #111111;
+        }
+
+        /* ================= REGISTER AREA ================= */
+
+        .register-area {
+            padding: 22px 30px 27px;
+
+            text-align: center;
+
+            border-top: 1px solid #ece5da;
+
+            background: #faf8f3;
+        }
+
+        .register-area p {
+            margin: 0 0 12px;
+
+            color: #817a6e;
+
+            font-size: 9px;
+        }
+
+        .create-account {
+            width: 100%;
+            min-height: 46px;
+
+            padding: 11px 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 12px;
+
+            border: 1px solid #cdbb84;
+            border-radius: 8px;
+
+            background: #ffffff;
+            color: #5f4c13;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .create-account:hover {
+            border-color: #111111;
+
+            background: #111111;
+            color: #d4af37;
+        }
+
+        /* ================= CARD NOTE ================= */
+
+        .login-secure-note {
+            margin-top: 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            color: #767168;
+
+            font-size: 7px;
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+        }
+
+        .login-secure-note span {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+            .login-page {
+                grid-template-columns: 1fr;
+
+                gap: 45px;
+
+                padding-top: 60px;
+                padding-bottom: 70px;
+            }
+
+            .login-intro {
+                max-width: 700px;
+            }
+
+            .login-card-wrapper {
+                width: min(100%, 540px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .login-navbar {
+                padding: 12px 5%;
+            }
+
+            .login-brand-copy small {
+                display: none;
+            }
+
+            .login-page {
+                min-height: calc(100vh - 65px);
+
+                padding:
+                    48px
+                    6%
+                    60px;
+            }
+
+            .login-intro h1 {
+                font-size: 47px;
+                letter-spacing: -2px;
+            }
+
+            .login-intro > p {
+                font-size: 12px;
+            }
+
+            .login-flow {
+                display: grid;
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+            .login-flow-item {
+                min-width: 0;
+            }
+
+            .login-card-header,
+            .login-form {
+                padding-left: 23px;
+                padding-right: 23px;
+            }
+
+            .login-messages {
+                padding-left: 23px;
+                padding-right: 23px;
+            }
+
+            .register-area {
+                padding-left: 23px;
+                padding-right: 23px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .login-brand-copy strong {
+                font-size: 13px;
+            }
+
+            .home-link {
+                padding: 8px 10px;
+            }
+
+            .login-intro h1 {
+                font-size: 42px;
+            }
+
+            .login-flow {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-    <div class="top-bar">
-        <h1>Reverse Shopping</h1>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="login-navbar">
 
-    <div class="container">
+        <a href="/" class="login-brand">
 
-        <div class="card">
+            <span class="login-logo">
+                R
+            </span>
 
-            <h2>Login</h2>
+            <span class="login-brand-copy">
 
-            {% if messages %}
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            {% endif %}
+                <strong>
+                    Reverse Shopping
+                </strong>
 
-            <form method="POST">
-                {% csrf_token %}
+                <small>
+                    SMARTER MARKETPLACE
+                </small>
 
-                <label>Email:</label>
-                <input type="email" name="email" required>
+            </span>
 
-                <label>Password:</label>
-                <input type="password" name="password" required>
+        </a>
 
-                <button type="submit">Login</button>
-            </form>
 
-            <br>
+        <a href="/" class="home-link">
+            Back to Home
+        </a>
 
-            <p>Don't have an account?</p>
+    </nav>
 
-            <a href="/register/">
-                <button type="button">Create Account</button>
-            </a>
 
-        </div>
+    <!-- LOGIN PAGE -->
+    <main class="login-page">
 
-    </div>
+
+        <!-- LEFT -->
+        <section class="login-intro">
+
+            <span class="login-eyebrow">
+                WELCOME BACK
+            </span>
+
+
+            <h1>
+                Sign in.<br>
+                <span>Start comparing.</span>
+            </h1>
+
+
+            <p>
+                Access your Reverse Shopping account to manage
+                requirements, respond to buyers, compare offers
+                and continue your marketplace activity.
+            </p>
+
+
+            <div class="login-flow">
+
+                <div class="login-flow-item">
+
+                    <span>
+                        01
+                    </span>
+
+                    <strong>
+                        POST
+                    </strong>
+
+                </div>
+
+
+                <div class="login-flow-item">
+
+                    <span>
+                        02
+                    </span>
+
+                    <strong>
+                        COMPARE
+                    </strong>
+
+                </div>
+
+
+                <div class="login-flow-item">
+
+                    <span>
+                        03
+                    </span>
+
+                    <strong>
+                        CHOOSE
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT -->
+        <section class="login-card-wrapper">
+
+            <div class="login-card">
+
+
+                <!-- CARD HEADER -->
+                <div class="login-card-header">
+
+                    <div>
+
+                        <small>
+                            ACCOUNT ACCESS
+                        </small>
+
+                        <h2>
+                            Login
+                        </h2>
+
+                    </div>
+
+
+                    <div class="login-card-icon">
+                        R
+                    </div>
+
+                </div>
+
+
+                <!-- DJANGO MESSAGES -->
+                {% if messages %}
+
+                    <div class="login-messages">
+
+                        {% for message in messages %}
+
+                            <p class="login-message">
+                                {{ message }}
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- LOGIN FORM -->
+                <form
+                    method="POST"
+                    class="login-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- EMAIL -->
+                    <div class="login-form-group">
+
+                        <label for="login-email">
+                            Email Address
+                        </label>
+
+
+                        <div class="login-input-wrap">
+
+                            <input
+                                type="email"
+                                id="login-email"
+                                name="email"
+                                placeholder="Enter your email address"
+                                autocomplete="email"
+                                required
+                            >
+
+                            <span class="field-symbol">
+                                @
+                            </span>
+
+                        </div>
+
+
+                        <span class="login-help">
+                            Enter the email registered with your account.
+                        </span>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+                    <div class="login-form-group">
+
+                        <label for="login-password">
+                            Password
+                        </label>
+
+
+                        <div class="login-input-wrap">
+
+                            <input
+                                type="password"
+                                id="login-password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <span class="field-symbol">
+                                ◇
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOGIN -->
+                    <button
+                        type="submit"
+                        class="login-submit"
+                    >
+                        Login to Account
+
+                        <span>
+                            →
+                        </span>
+                    </button>
+
+                </form>
+
+
+                <!-- REGISTER -->
+                <div class="register-area">
+
+                    <p>
+                        Don't have an account?
+                    </p>
+
+
+                    <a
+                        href="/register/"
+                        class="create-account"
+                    >
+                        Create New Account
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="login-secure-note">
+
+                <span></span>
+
+                BUYER & SELLER ACCOUNT ACCESS
+
+            </div>
+
+        </section>
+
+    </main>
 
 </body>
+
 </html>

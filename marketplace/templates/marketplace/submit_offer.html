@@ -3,106 +3,1505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Submit Offer - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 5% 8%, rgba(212, 175, 55, 0.08), transparent 23%),
+                #f8f5ed;
+            color: #191917;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .so-navbar {
+            min-height: 78px;
+            padding: 14px clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .so-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #111111;
+        }
+
+        .so-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .so-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .so-brand-text strong {
+            font-size: 15px;
+        }
+
+        .so-brand-text small {
+            color: #928b7e;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .so-nav-back {
+            padding: 9px 16px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            color: #28251f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .so-nav-back:hover {
+            background: #111111;
+            border-color: #111111;
+            color: #d4af37;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .so-hero {
+            position: relative;
+
+            min-height: 350px;
+
+            padding:
+                58px
+                clamp(30px, 8vw, 125px);
+
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 60px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 83% 25%,
+                    rgba(212, 175, 55, 0.14),
+                    transparent 24%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c,
+                    #151512 58%,
+                    #1c1a13
+                );
+
+            color: #ffffff;
+        }
+
+        .so-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 420px;
+            height: 420px;
+
+            right: -170px;
+            top: -240px;
+
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            border-radius: 50%;
+        }
+
+        .so-hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 680px;
+        }
+
+        .so-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #dfc66f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2.2px;
+        }
+
+        .so-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .so-hero h1 {
+            margin: 17px 0 18px;
+
+            color: #ffffff;
+
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-size: clamp(45px, 5vw, 65px);
+            font-weight: 500;
+
+            line-height: 1;
+
+            letter-spacing: -2px;
+        }
+
+        .so-hero h1 span {
+            color: #dfc66f;
+            font-style: italic;
+        }
+
+        .so-hero p {
+            max-width: 580px;
+
+            margin: 0;
+
+            color: #bcb8ae;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+        .so-hero-symbol {
+            position: relative;
+            z-index: 2;
+
+            width: 145px;
+            height: 145px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(212, 175, 55, 0.11),
+                    transparent 67%
+                );
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 54px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .so-main {
+            width: min(1180px, 90%);
+
+            margin: 0 auto;
+
+            padding: 65px 0 80px;
+        }
+
+        .so-layout {
+            display: grid;
+
+            grid-template-columns:
+                minmax(280px, 0.72fr)
+                minmax(0, 1.35fr);
+
+            align-items: start;
+
+            gap: 24px;
+        }
+
+        /* =========================
+           REQUIREMENT SUMMARY
+        ========================= */
+
+        .so-requirement {
+            position: sticky;
+            top: 25px;
+
+            overflow: hidden;
+
+            border: 1px solid #e2dacb;
+            border-radius: 16px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 14px 40px rgba(35, 30, 20, 0.05);
+        }
+
+        .so-requirement-head {
+            padding: 25px;
+
+            background: #171715;
+
+            color: #ffffff;
+        }
+
+        .so-small-label {
+            color: #a98b32;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+        }
+
+        .so-requirement-head h2 {
+            margin: 8px 0 7px;
+
+            font-family: Georgia, serif;
+
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .so-requirement-head p {
+            margin: 0;
+
+            color: #918d83;
+
+            font-size: 10px;
+
+            line-height: 1.6;
+        }
+
+        .so-requirement-body {
+            padding: 8px 25px 25px;
+        }
+
+        .so-requirement-item {
+            padding: 17px 0;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 5px;
+
+            border-bottom: 1px solid #eee8dd;
+        }
+
+        .so-requirement-item:last-child {
+            border-bottom: 0;
+        }
+
+        .so-requirement-item span {
+            color: #989082;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.1px;
+
+            text-transform: uppercase;
+        }
+
+        .so-requirement-item strong {
+            color: #29261f;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+        .so-budget {
+            margin: 16px -5px 0;
+
+            padding: 17px;
+
+            border: 1px solid #e2cf8f;
+            border-radius: 10px;
+
+            background: #f8f1dc;
+        }
+
+        .so-budget span {
+            color: #806c2c;
+        }
+
+        .so-budget strong {
+            color: #72570c;
+
+            font-family: Georgia, serif;
+
+            font-size: 20px;
+        }
+
+        /* =========================
+           FORM CARD
+        ========================= */
+
+        .so-form-card {
+            overflow: hidden;
+
+            border: 1px solid #e2dacb;
+            border-radius: 16px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 14px 45px rgba(35, 30, 20, 0.055);
+        }
+
+        .so-form-header {
+            padding: 28px 32px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            border-bottom: 1px solid #eae3d7;
+        }
+
+        .so-form-header span {
+            color: #967616;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+        }
+
+        .so-form-header h2 {
+            margin: 7px 0 0;
+
+            color: #191917;
+
+            font-family: Georgia, serif;
+
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .so-form-step {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 14px;
+        }
+
+        .so-form {
+            padding: 32px;
+        }
+
+        /* =========================
+           FORM SECTION
+        ========================= */
+
+        .so-form-section {
+            margin-bottom: 37px;
+        }
+
+        .so-form-section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .so-section-title {
+            margin-bottom: 22px;
+
+            padding-bottom: 14px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            border-bottom: 1px solid #eee8dd;
+        }
+
+        .so-section-icon {
+            width: 34px;
+            height: 34px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #171715;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 15px;
+        }
+
+        .so-section-title div {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .so-section-title small {
+            color: #a08f5b;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.3px;
+        }
+
+        .so-section-title h3 {
+            margin: 0;
+
+            font-family: Georgia, serif;
+
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .so-form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 20px;
+        }
+
+        .so-field {
+            display: flex;
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+        .so-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .so-field label {
+            color: #4e493f;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .so-required {
+            color: #9a7610;
+        }
+
+        .so-field input,
+        .so-field textarea,
+        .so-field select {
+            width: 100%;
+
+            border: 1px solid #ddd6c9;
+            border-radius: 9px;
+
+            outline: none;
+
+            background: #fcfbf8;
+
+            color: #24221e;
+
+            font-size: 12px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .so-field input,
+        .so-field select {
+            min-height: 47px;
+
+            padding: 0 14px;
+        }
+
+        .so-field textarea {
+            min-height: 120px;
+
+            padding: 13px 14px;
+
+            resize: vertical;
+
+            line-height: 1.6;
+        }
+
+        .so-field input:focus,
+        .so-field textarea:focus,
+        .so-field select:focus {
+            border-color: #c3a13a;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 0 0 3px rgba(212, 175, 55, 0.11);
+        }
+
+        .so-helper {
+            color: #999185;
+
+            font-size: 9px;
+
+            line-height: 1.5;
+        }
+
+        /* =========================
+           PRICE FIELD
+        ========================= */
+
+        .so-price-field {
+            position: relative;
+        }
+
+        .so-price-field::before {
+            content: "₹";
+
+            position: absolute;
+
+            left: 15px;
+            bottom: 14px;
+
+            z-index: 2;
+
+            color: #8a6b10;
+
+            font-family: Georgia, serif;
+            font-weight: 700;
+        }
+
+        .so-price-field input {
+            padding-left: 34px;
+        }
+
+        /* =========================
+           IMAGE UPLOAD
+        ========================= */
+
+        .so-upload-box {
+            position: relative;
+
+            padding: 22px;
+
+            display: grid;
+
+            grid-template-columns: auto 1fr;
+
+            align-items: center;
+
+            gap: 16px;
+
+            border: 1px dashed #cfc4ae;
+            border-radius: 11px;
+
+            background: #faf8f2;
+        }
+
+        .so-upload-icon {
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-size: 18px;
+        }
+
+        .so-upload-copy strong {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: #312e28;
+
+            font-size: 11px;
+        }
+
+        .so-upload-copy span {
+            color: #928b7e;
+
+            font-size: 9px;
+        }
+
+        .so-upload-box input[type="file"] {
+            grid-column: 1 / -1;
+
+            width: 100%;
+
+            min-height: auto;
+
+            padding: 9px;
+
+            border: 1px solid #ded6c8;
+            border-radius: 8px;
+
+            background: #ffffff;
+
+            color: #665f54;
+
+            font-size: 10px;
+        }
+
+        .so-upload-box input[type="file"]::file-selector-button {
+            margin-right: 12px;
+
+            padding: 8px 12px;
+
+            border: 0;
+            border-radius: 6px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            cursor: pointer;
+        }
+
+        /* =========================
+           OFFER SECTION
+        ========================= */
+
+        .so-offer-section {
+            margin-top: 7px;
+
+            padding: 25px;
+
+            border: 1px solid #e2d7b8;
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fbf8ee,
+                    #f7f1df
+                );
+        }
+
+        .so-offer-section .so-section-title {
+            border-color: #e5d8b6;
+        }
+
+        .so-offer-highlight {
+            margin-bottom: 22px;
+
+            padding: 13px 15px;
+
+            border-left: 3px solid #d4af37;
+
+            background: rgba(255, 255, 255, 0.65);
+
+            color: #74694c;
+
+            font-size: 10px;
+
+            line-height: 1.6;
+        }
+
+        /* =========================
+           SUBMIT AREA
+        ========================= */
+
+        .so-submit-area {
+            margin-top: 30px;
+
+            padding-top: 25px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            border-top: 1px solid #e9e2d6;
+        }
+
+        .so-submit-note {
+            max-width: 390px;
+
+            color: #8b8478;
+
+            font-size: 9px;
+
+            line-height: 1.6;
+        }
+
+        .so-submit-btn {
+            min-width: 180px;
+            min-height: 48px;
+
+            padding: 12px 20px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 24px;
+
+            border: 1px solid #111111;
+            border-radius: 8px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .so-submit-btn span {
+            font-size: 17px;
+        }
+
+        .so-submit-btn:hover {
+            transform: translateY(-2px);
+
+            background: #d4af37;
+            border-color: #d4af37;
+
+            color: #111111;
+        }
+
+        /* =========================
+           BACK
+        ========================= */
+
+        .so-bottom-back {
+            margin-top: 30px;
+        }
+
+        .so-back-button {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #3e3931;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .so-back-button span {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #111111;
+
+            color: #d4af37;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .so-footer {
+            padding:
+                27px
+                clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            border-top: 1px solid #e7e0d2;
+
+            background: #ffffff;
+        }
+
+        .so-footer-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .so-footer-logo {
+            width: 33px;
+            height: 33px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .so-footer-brand strong {
+            color: #181816;
+
+            font-size: 12px;
+        }
+
+        .so-footer p,
+        .so-footer > span {
+            margin: 0;
+
+            color: #817b70;
+
+            font-size: 9px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+            .so-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .so-requirement {
+                position: static;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .so-navbar {
+                padding: 12px 5%;
+            }
+
+            .so-brand-text small {
+                display: none;
+            }
+
+            .so-hero {
+                padding: 48px 6%;
+                grid-template-columns: 1fr;
+            }
+
+            .so-hero h1 {
+                font-size: 43px;
+            }
+
+            .so-hero-symbol {
+                display: none;
+            }
+
+            .so-main {
+                width: 92%;
+                padding: 45px 0 60px;
+            }
+
+            .so-form-header,
+            .so-form {
+                padding-left: 23px;
+                padding-right: 23px;
+            }
+
+            .so-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .so-field-full {
+                grid-column: auto;
+            }
+
+            .so-submit-area {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .so-submit-btn {
+                width: 100%;
+            }
+
+            .so-footer {
+                padding: 25px 6%;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .so-brand-text strong {
+                font-size: 13px;
+            }
+
+            .so-nav-back {
+                padding: 8px 11px;
+            }
+
+            .so-offer-section {
+                padding: 18px;
+            }
+
+            .so-upload-box {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-    <div class="top-bar">
-        <h1>Submit Offer</h1>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="so-navbar">
 
-    <div class="container">
+        <a href="/" class="so-brand">
+            <span class="so-logo">R</span>
 
-        <div class="card">
-            <h2>Buyer Requirement</h2>
-
-            <p>
-                <strong>Product:</strong>
-                {{ requirement.product_type }}
-            </p>
-
-            <p>
-                <strong>Category:</strong>
-                {{ requirement.category.name }}
-            </p>
-
-            <p>
-                <strong>Budget:</strong>
-                ₹{{ requirement.budget_min }} - ₹{{ requirement.budget_max }}
-            </p>
-
-            <p>
-                <strong>Preferred Brand:</strong>
-                {{ requirement.preferred_brand|default:"Not specified" }}
-            </p>
-
-            <p>
-                <strong>Additional Requirements:</strong>
-                {{ requirement.additional_requirements|default:"None" }}
-            </p>
-        </div>
-
-
-        <div class="card">
-
-            <h2>Your Product</h2>
-
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-
-                <label>Product Name:</label>
-                <input type="text" name="product_name" required>
-
-                <label>Product Description:</label>
-                <textarea name="product_description"></textarea>
-
-                <label>Product Price:</label>
-                <input type="number" name="product_price" step="0.01" required>
-                
-                <label>Product Image:</label>
-                <input type="file" name="product_image" accept="image/*">
-
-
-                <label>Condition:</label>
-                <select name="condition_type" required>
-                    <option value="">Select Condition</option>
-                    <option value="new">New</option>
-                    <option value="used">Used</option>
-                </select>
-
-                <label>Brand:</label>
-                <input type="text" name="brand">
-
-
-                <h2>Offer Details</h2>
-
-                <label>Your Offer Price:</label>
-                <input type="number" name="offer_price" step="0.01" required>
-
-                <label>Delivery Days:</label>
-                <input type="number" name="delivery_days">
-
-                <label>Warranty:</label>
-                <input type="text" name="warranty">
-
-                <label>Message to Buyer:</label>
-                <textarea name="message"></textarea>
-
-                <button type="submit">Submit Offer</button>
-
-            </form>
-
-        </div>
-
-        <a href="/buyer-requirements/">
-            <button>Back to Buyer Requirements</button>
+            <span class="so-brand-text">
+                <strong>Reverse Shopping</strong>
+                <small>Seller Workspace</small>
+            </span>
         </a>
 
-    </div>
+        <a href="/buyer-requirements/" class="so-nav-back">
+            ← Buyer Requirements
+        </a>
+
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="so-hero">
+
+        <div class="so-hero-content">
+
+            <span class="so-eyebrow">
+                SELLER WORKSPACE
+            </span>
+
+            <h1>
+                Submit your<br>
+                <span>best offer.</span>
+            </h1>
+
+            <p>
+                Review the buyer's requirement, provide your product
+                information and create a competitive offer.
+            </p>
+
+        </div>
+
+
+        <div class="so-hero-symbol">
+            ₹
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="so-main">
+
+        <div class="so-layout">
+
+
+            <!-- LEFT : BUYER REQUIREMENT -->
+            <aside class="so-requirement">
+
+                <div class="so-requirement-head">
+
+                    <span class="so-small-label">
+                        BUYER REQUEST
+                    </span>
+
+                    <h2>
+                        Requirement Summary
+                    </h2>
+
+                    <p>
+                        Review what the buyer is looking for
+                        before submitting your offer.
+                    </p>
+
+                </div>
+
+
+                <div class="so-requirement-body">
+
+                    <div class="so-requirement-item">
+                        <span>Product</span>
+                        <strong>
+                            {{ requirement.product_type }}
+                        </strong>
+                    </div>
+
+
+                    <div class="so-requirement-item">
+                        <span>Category</span>
+                        <strong>
+                            {{ requirement.category.name }}
+                        </strong>
+                    </div>
+
+
+                    <div class="so-requirement-item so-budget">
+                        <span>Buyer Budget</span>
+
+                        <strong>
+                            ₹{{ requirement.budget_min }}
+                            – ₹{{ requirement.budget_max }}
+                        </strong>
+                    </div>
+
+
+                    <div class="so-requirement-item">
+                        <span>Preferred Brand</span>
+
+                        <strong>
+                            {{ requirement.preferred_brand|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+
+                    <div class="so-requirement-item">
+                        <span>Additional Requirements</span>
+
+                        <strong>
+                            {{ requirement.additional_requirements|default:"None" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- RIGHT : FORM -->
+            <section class="so-form-card">
+
+                <div class="so-form-header">
+
+                    <div>
+                        <span>CREATE OFFER</span>
+                        <h2>Product &amp; Offer Details</h2>
+                    </div>
+
+                    <div class="so-form-step">
+                        01
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="so-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- PRODUCT DETAILS -->
+                    <section class="so-form-section">
+
+                        <div class="so-section-title">
+
+                            <span class="so-section-icon">
+                                ◇
+                            </span>
+
+                            <div>
+                                <small>PRODUCT INFORMATION</small>
+                                <h3>Your Product</h3>
+                            </div>
+
+                        </div>
+
+
+                        <div class="so-form-grid">
+
+
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Product Name
+                                    <span class="so-required">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="product_name"
+                                    placeholder="Enter the product name"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Product Description
+                                </label>
+
+                                <textarea
+                                    name="product_description"
+                                    placeholder="Describe the product, specifications and important details"
+                                ></textarea>
+
+                            </div>
+
+
+                            <div class="so-field so-price-field">
+
+                                <label>
+                                    Product Price
+                                    <span class="so-required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="product_price"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="so-field">
+
+                                <label>
+                                    Condition
+                                    <span class="so-required">*</span>
+                                </label>
+
+                                <select
+                                    name="condition_type"
+                                    required
+                                >
+                                    <option value="">
+                                        Select Condition
+                                    </option>
+
+                                    <option value="new">
+                                        New
+                                    </option>
+
+                                    <option value="used">
+                                        Used
+                                    </option>
+                                </select>
+
+                            </div>
+
+
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Brand
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="brand"
+                                    placeholder="Enter product brand"
+                                >
+
+                            </div>
+
+
+                            <!-- IMAGE -->
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Product Image
+                                </label>
+
+                                <div class="so-upload-box">
+
+                                    <div class="so-upload-icon">
+                                        +
+                                    </div>
+
+                                    <div class="so-upload-copy">
+                                        <strong>
+                                            Add a product image
+                                        </strong>
+
+                                        <span>
+                                            Choose a clear image of the product you are offering.
+                                        </span>
+                                    </div>
+
+                                    <input
+                                        type="file"
+                                        name="product_image"
+                                        accept="image/*"
+                                        multiple
+                                    >
+
+                                </div>
+
+                                <span class="so-helper">
+                                    Product image helps the buyer understand your offer.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- OFFER DETAILS -->
+                    <section class="so-form-section so-offer-section">
+
+                        <div class="so-section-title">
+
+                            <span class="so-section-icon">
+                                ₹
+                            </span>
+
+                            <div>
+                                <small>COMPETITIVE OFFER</small>
+                                <h3>Offer Details</h3>
+                            </div>
+
+                        </div>
+
+
+                        <div class="so-offer-highlight">
+                            Your offer will be compared with other seller offers
+                            submitted for this buyer requirement.
+                        </div>
+
+
+                        <div class="so-form-grid">
+
+
+                            <div class="so-field so-price-field">
+
+                                <label>
+                                    Your Offer Price
+                                    <span class="so-required">*</span>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="offer_price"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="so-field">
+
+                                <label>
+                                    Delivery Days
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="delivery_days"
+                                    placeholder="Example: 3"
+                                >
+
+                            </div>
+
+
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Warranty
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="warranty"
+                                    placeholder="Example: 1 year manufacturer warranty"
+                                >
+
+                            </div>
+
+
+                            <div class="so-field so-field-full">
+
+                                <label>
+                                    Message to Buyer
+                                </label>
+
+                                <textarea
+                                    name="message"
+                                    placeholder="Add any useful information about your offer"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- SUBMIT -->
+                    <div class="so-submit-area">
+
+                        <span class="so-submit-note">
+                            Review your product and offer details before submitting.
+                        </span>
+
+                        <button
+                            type="submit"
+                            class="so-submit-btn"
+                        >
+                            Submit Offer
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+
+        <!-- BACK -->
+        <div class="so-bottom-back">
+
+            <a
+                href="/buyer-requirements/"
+                class="so-back-button"
+            >
+                <span>←</span>
+                Back to Buyer Requirements
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="so-footer">
+
+        <div class="so-footer-brand">
+            <span class="so-footer-logo">R</span>
+            <strong>Reverse Shopping</strong>
+        </div>
+
+        <p>
+            Better offers begin with understanding what buyers need.
+        </p>
+
+        <span>
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
 </html>

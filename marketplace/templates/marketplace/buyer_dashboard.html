@@ -1,57 +1,1440 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Buyer Dashboard - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 6% 10%, rgba(212, 175, 55, 0.07), transparent 22%),
+                #f8f5ed;
+            color: #191917;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           NAVBAR
+        ===================================== */
+
+        .bd-navbar {
+            min-height: 78px;
+            padding: 14px clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .bd-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            color: #111111;
+        }
+
+        .bd-logo-mark {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .bd-logo-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bd-logo-copy strong {
+            font-size: 15px;
+        }
+
+        .bd-logo-copy small {
+            color: #928b7e;
+
+            font-size: 8px;
+            font-weight: 700;
+
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .bd-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .bd-user-label {
+            color: #716b60;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .bd-user-label::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            display: inline-block;
+
+            margin-right: 8px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            box-shadow:
+                0 0 0 4px rgba(212, 175, 55, 0.13);
+        }
+
+        .bd-logout {
+            padding: 9px 16px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            color: #28251f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .bd-logout:hover {
+            background: #111111;
+            border-color: #111111;
+
+            color: #d4af37;
+        }
+
+        /* =====================================
+           HERO
+        ===================================== */
+
+        .bd-hero {
+            position: relative;
+
+            min-height: 475px;
+
+            padding:
+                70px
+                clamp(30px, 8vw, 125px);
+
+            display: grid;
+            grid-template-columns:
+                minmax(0, 1.15fr)
+                minmax(300px, 0.85fr);
+
+            align-items: center;
+
+            gap: 70px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 84% 24%,
+                    rgba(212, 175, 55, 0.15),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c,
+                    #151512 58%,
+                    #1c1a13
+                );
+
+            color: #ffffff;
+        }
+
+        .bd-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 440px;
+            height: 440px;
+
+            right: -190px;
+            top: -250px;
+
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            border-radius: 50%;
+        }
+
+        .bd-hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 270px;
+            height: 270px;
+
+            right: -80px;
+            bottom: -190px;
+
+            border: 1px solid rgba(212, 175, 55, 0.08);
+            border-radius: 50%;
+        }
+
+        .bd-hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 690px;
+        }
+
+        .bd-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #dfc66f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2.2px;
+        }
+
+        .bd-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .bd-hero h1 {
+            margin: 18px 0 21px;
+
+            color: #ffffff;
+
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-size: clamp(48px, 5.5vw, 72px);
+            font-weight: 500;
+
+            line-height: 0.98;
+
+            letter-spacing: -2.5px;
+        }
+
+        .bd-hero h1 span {
+            color: #dfc66f;
+            font-style: italic;
+        }
+
+        .bd-hero-description {
+            max-width: 590px;
+
+            margin: 0 0 29px;
+
+            color: #bcb8ae;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+        .bd-primary-button {
+            min-height: 48px;
+
+            padding: 12px 20px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 15px;
+
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .bd-primary-button:hover {
+            transform: translateY(-2px);
+
+            background: #e0c258;
+        }
+
+        .bd-primary-plus {
+            font-size: 17px;
+            font-weight: 400;
+        }
+
+        /* =====================================
+           HERO ART
+        ===================================== */
+
+        .bd-hero-art {
+            position: relative;
+            z-index: 2;
+
+            min-height: 300px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bd-art-circle {
+            position: absolute;
+
+            width: 275px;
+            height: 275px;
+
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            border-radius: 50%;
+        }
+
+        .bd-art-circle::before {
+            content: "";
+
+            position: absolute;
+
+            width: 210px;
+            height: 210px;
+
+            left: 31px;
+            top: 31px;
+
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+        }
+
+        .bd-art-card {
+            position: relative;
+            z-index: 2;
+
+            width: 265px;
+
+            padding: 29px 27px 23px;
+
+            border: 1px solid rgba(212, 175, 55, 0.27);
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #24231e,
+                    #151512
+                );
+
+            box-shadow:
+                0 30px 65px rgba(0, 0, 0, 0.38);
+
+            transform: rotate(2deg);
+        }
+
+        .bd-art-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .bd-art-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #51482d;
+            border-radius: 11px;
+
+            background: #191915;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 23px;
+        }
+
+        .bd-art-number {
+            color: #5d584d;
+
+            font-family: Georgia, serif;
+            font-size: 29px;
+        }
+
+        .bd-art-label {
+            display: block;
+
+            margin-top: 24px;
+
+            color: #a98b32;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .bd-art-card h3 {
+            margin: 8px 0 22px;
+
+            color: #ffffff;
+
+            font-family: Georgia, serif;
+
+            font-size: 25px;
+            font-weight: 500;
+
+            line-height: 1.25;
+        }
+
+        .bd-art-divider {
+            height: 1px;
+
+            margin-bottom: 17px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(212, 175, 55, 0.45),
+                    transparent
+                );
+        }
+
+        .bd-art-bottom {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 10px;
+
+            color: #817c71;
+
+            font-size: 7px;
+            font-weight: 700;
+
+            letter-spacing: 0.8px;
+
+            text-transform: uppercase;
+        }
+
+        /* =====================================
+           MAIN
+        ===================================== */
+
+        .bd-main {
+            width: min(1180px, 90%);
+
+            margin: 0 auto;
+
+            padding: 70px 0 82px;
+        }
+
+        .bd-section-heading {
+            margin-bottom: 34px;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+        }
+
+        .bd-section-eyebrow {
+            color: #967616;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.9px;
+        }
+
+        .bd-section-heading h2 {
+            margin: 8px 0 8px;
+
+            font-family: Georgia, serif;
+
+            font-size: clamp(31px, 3vw, 41px);
+            font-weight: 500;
+
+            letter-spacing: -1px;
+        }
+
+        .bd-section-heading p {
+            margin: 0;
+
+            color: #797267;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        .bd-section-chip {
+            flex-shrink: 0;
+
+            padding: 9px 14px;
+
+            border: 1px solid #ddd3bf;
+            border-radius: 30px;
+
+            background: #ffffff;
+
+            color: #665e50;
+
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .bd-section-chip::before {
+            content: "";
+
+            width: 6px;
+            height: 6px;
+
+            display: inline-block;
+
+            margin-right: 7px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+        }
+
+        /* =====================================
+           ACTION CARDS
+        ===================================== */
+
+        .bd-action-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 22px;
+        }
+
+        .bd-action-card {
+            position: relative;
+
+            min-height: 260px;
+
+            padding: 29px;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow: hidden;
+
+            border: 1px solid #e2dacb;
+            border-radius: 16px;
+
+            background: #ffffff;
+
+            color: #191917;
+
+            box-shadow:
+                0 14px 42px rgba(35, 30, 20, 0.045);
+
+            transition:
+                transform 0.22s ease,
+                box-shadow 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        .bd-action-card:hover {
+            transform: translateY(-5px);
+
+            border-color: #d8cba7;
+
+            box-shadow:
+                0 22px 55px rgba(35, 30, 20, 0.09);
+        }
+
+        .bd-action-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 115px;
+            height: 115px;
+
+            right: -65px;
+            bottom: -65px;
+
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            border-radius: 50%;
+        }
+
+        .bd-action-featured {
+            background:
+                linear-gradient(
+                    135deg,
+                    #171715,
+                    #222018
+                );
+
+            border-color: #28261f;
+
+            color: #ffffff;
+        }
+
+        .bd-action-featured::after {
+            width: 170px;
+            height: 170px;
+
+            right: -80px;
+            bottom: -90px;
+
+            border-color: rgba(212, 175, 55, 0.18);
+        }
+
+        .bd-action-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .bd-action-icon {
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: #171715;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 20px;
+        }
+
+        .bd-action-featured .bd-action-icon {
+            border: 1px solid #4c452f;
+
+            background: #11110f;
+        }
+
+        .bd-card-number {
+            color: #c7bfae;
+
+            font-family: Georgia, serif;
+            font-size: 20px;
+        }
+
+        .bd-action-featured .bd-card-number {
+            color: #625b49;
+        }
+
+        .bd-action-card h3 {
+            margin: 25px 0 10px;
+
+            font-family: Georgia, serif;
+
+            font-size: 23px;
+            font-weight: 500;
+
+            line-height: 1.25;
+        }
+
+        .bd-action-card p {
+            max-width: 440px;
+
+            margin: 0 0 25px;
+
+            color: #80796e;
+
+            font-size: 11px;
+
+            line-height: 1.75;
+        }
+
+        .bd-action-featured p {
+            color: #a6a197;
+        }
+
+        .bd-card-link {
+            margin-top: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding-top: 18px;
+
+            border-top: 1px solid #eee8dd;
+
+            color: #292620;
+
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .bd-card-link span {
+            font-size: 17px;
+
+            transition: transform 0.2s ease;
+        }
+
+        .bd-action-card:hover .bd-card-link span {
+            transform: translateX(4px);
+        }
+
+        .bd-action-featured .bd-card-link {
+            border-color: #36342c;
+
+            color: #d4af37;
+        }
+
+        /* =====================================
+           INFO BANNER
+        ===================================== */
+
+        .bd-info-banner {
+            position: relative;
+
+            margin-top: 27px;
+
+            padding: 34px 37px;
+
+            display: grid;
+
+            grid-template-columns:
+                auto
+                1fr
+                auto;
+
+            align-items: center;
+
+            gap: 25px;
+
+            overflow: hidden;
+
+            border: 1px solid #e0d3ad;
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8f0d8,
+                    #fbf8ee
+                );
+        }
+
+        .bd-info-banner::after {
+            content: "";
+
+            position: absolute;
+
+            width: 190px;
+            height: 190px;
+
+            right: -90px;
+            top: -120px;
+
+            border: 1px solid rgba(159, 126, 26, 0.12);
+            border-radius: 50%;
+        }
+
+        .bd-info-symbol {
+            width: 53px;
+            height: 53px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 13px;
+
+            background: #171715;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 24px;
+        }
+
+        .bd-info-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .bd-info-content > span {
+            color: #92731c;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .bd-info-content h3 {
+            margin: 6px 0 5px;
+
+            color: #2c2923;
+
+            font-family: Georgia, serif;
+
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .bd-info-content p {
+            margin: 0;
+
+            color: #756d5e;
+
+            font-size: 10px;
+
+            line-height: 1.6;
+        }
+
+        .bd-info-button {
+            position: relative;
+            z-index: 2;
+
+            min-width: 135px;
+
+            padding: 11px 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            border-radius: 8px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .bd-info-button:hover {
+            transform: translateY(-2px);
+
+            background: #29271f;
+        }
+
+        .bd-info-button span {
+            font-size: 16px;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .bd-footer {
+            padding:
+                27px
+                clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            border-top: 1px solid #e7e0d2;
+
+            background: #ffffff;
+        }
+
+        .bd-footer-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .bd-footer-logo {
+            width: 33px;
+            height: 33px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .bd-footer-brand strong {
+            font-size: 12px;
+        }
+
+        .bd-footer p,
+        .bd-footer > span {
+            margin: 0;
+
+            color: #817b70;
+
+            font-size: 9px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 900px) {
+            .bd-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .bd-hero-art {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .bd-navbar {
+                padding: 12px 5%;
+            }
+
+            .bd-user-label {
+                display: none;
+            }
+
+            .bd-logo-copy small {
+                display: none;
+            }
+
+            .bd-hero {
+                min-height: 410px;
+
+                padding: 55px 6%;
+            }
+
+            .bd-hero h1 {
+                font-size: 46px;
+            }
+
+            .bd-main {
+                width: 92%;
+
+                padding: 50px 0 62px;
+            }
+
+            .bd-section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .bd-action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bd-info-banner {
+                grid-template-columns: auto 1fr;
+            }
+
+            .bd-info-button {
+                grid-column: 1 / -1;
+
+                width: 100%;
+
+                justify-content: center;
+            }
+
+            .bd-footer {
+                padding: 25px 6%;
+
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .bd-logo-copy strong {
+                font-size: 13px;
+            }
+
+            .bd-logout {
+                padding: 8px 11px;
+            }
+
+            .bd-hero h1 {
+                font-size: 40px;
+            }
+
+            .bd-action-card {
+                padding: 24px;
+            }
+
+            .bd-info-banner {
+                padding: 26px 22px;
+
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-    <div class="top-bar">
-        <h1>Buyer Dashboard</h1>
-        <p>Welcome to Reverse Shopping</p>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="bd-navbar">
 
-    <div class="container">
+        <a href="/" class="bd-logo">
 
-        <div class="card">
+            <span class="bd-logo-mark">
+                R
+            </span>
 
-            <h2>Manage Your Shopping Requirements</h2>
+            <span class="bd-logo-copy">
 
-            <p>
-                Post what you need and compare competitive seller offers.
+                <strong>
+                    Reverse Shopping
+                </strong>
+
+                <small>
+                    Buyer Workspace
+                </small>
+
+            </span>
+
+        </a>
+
+
+        <div class="bd-nav-right">
+
+            <span class="bd-user-label">
+                Buyer Account
+            </span>
+
+            <a href="/logout/" class="bd-logout">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="bd-hero">
+
+        <div class="bd-hero-content">
+
+            <span class="bd-eyebrow">
+                BUYER DASHBOARD
+            </span>
+
+            <h1>
+                Welcome to your<br>
+                <span>shopping space.</span>
+            </h1>
+
+            <p class="bd-hero-description">
+                Post what you need, receive competitive seller offers,
+                and compare them to find the right choice for you.
             </p>
 
-            <div class="actions">
 
-                <a href="/post-requirement/">
-                    <button>Post Product Requirement</button>
-                </a>
+            <a
+                href="/post-requirement/"
+                class="bd-primary-button"
+            >
+                <span class="bd-primary-plus">+</span>
 
-                <a href="/my-requirements/">
-                    <button>My Requirements</button>
-                </a>
-                <a href="/profile/">
-                    <button>My Profile</button>
-                </a>
-                <a href="/notifications/">
-                    <button>🔔 Notifications</button>
-                </a>
+                Post a Product Requirement
+            </a>
 
-                <a href="/logout/">
-                    <button>Logout</button>
-                </a>
+        </div>
+
+
+        <!-- HERO ART -->
+        <div class="bd-hero-art">
+
+            <div class="bd-art-circle"></div>
+
+
+            <div class="bd-art-card">
+
+                <div class="bd-art-top">
+
+                    <div class="bd-art-icon">
+                        ⇄
+                    </div>
+
+                    <span class="bd-art-number">
+                        01
+                    </span>
+
+                </div>
+
+
+                <span class="bd-art-label">
+                    YOUR SHOPPING
+                </span>
+
+
+                <h3>
+                    Your needs.<br>
+                    Multiple offers.
+                </h3>
+
+
+                <div class="bd-art-divider"></div>
+
+
+                <div class="bd-art-bottom">
+
+                    <span>Post</span>
+
+                    <span>Compare</span>
+
+                    <span>Choose</span>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+    </header>
+
+
+    <!-- MAIN DASHBOARD -->
+    <main class="bd-main">
+
+
+        <!-- SECTION HEADING -->
+        <div class="bd-section-heading">
+
+            <div>
+
+                <span class="bd-section-eyebrow">
+                    YOUR ACCOUNT
+                </span>
+
+                <h2>
+                    Manage your shopping
+                </h2>
+
+                <p>
+                    Everything you need to manage your
+                    requirements and account.
+                </p>
+
+            </div>
+
+
+            <span class="bd-section-chip">
+                Buyer Workspace
+            </span>
+
+        </div>
+
+
+        <!-- ACTION CARDS -->
+        <section class="bd-action-grid">
+
+
+            <!-- POST REQUIREMENT -->
+            <a
+                href="/post-requirement/"
+                class="bd-action-card bd-action-featured"
+            >
+
+                <div class="bd-action-top">
+
+                    <span class="bd-action-icon">
+                        +
+                    </span>
+
+                    <span class="bd-card-number">
+                        01
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    Post Product Requirement
+                </h3>
+
+
+                <p>
+                    Tell sellers what product you need,
+                    your budget and your preferences.
+                </p>
+
+
+                <span class="bd-card-link">
+
+                    Create requirement
+
+                    <span>→</span>
+
+                </span>
+
+            </a>
+
+
+            <!-- MY REQUIREMENTS -->
+            <a
+                href="/my-requirements/"
+                class="bd-action-card"
+            >
+
+                <div class="bd-action-top">
+
+                    <span class="bd-action-icon">
+                        ▤
+                    </span>
+
+                    <span class="bd-card-number">
+                        02
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    My Requirements
+                </h3>
+
+
+                <p>
+                    View the product requirements you have
+                    already posted and review their offers.
+                </p>
+
+
+                <span class="bd-card-link">
+
+                    View requirements
+
+                    <span>→</span>
+
+                </span>
+
+            </a>
+
+
+            <!-- PROFILE -->
+            <a
+                href="/profile/"
+                class="bd-action-card"
+            >
+
+                <div class="bd-action-top">
+
+                    <span class="bd-action-icon">
+                        ♙
+                    </span>
+
+                    <span class="bd-card-number">
+                        03
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    My Profile
+                </h3>
+
+
+                <p>
+                    View and update your personal
+                    account information and details.
+                </p>
+
+
+                <span class="bd-card-link">
+
+                    Manage profile
+
+                    <span>→</span>
+
+                </span>
+
+            </a>
+
+
+            <!-- NOTIFICATIONS -->
+            <a
+                href="/notifications/"
+                class="bd-action-card"
+            >
+
+                <div class="bd-action-top">
+
+                    <span class="bd-action-icon">
+                        ◇
+                    </span>
+
+                    <span class="bd-card-number">
+                        04
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    Notifications
+                </h3>
+
+
+                <p>
+                    Check updates and alerts related to
+                    your requirements and seller offers.
+                </p>
+
+
+                <span class="bd-card-link">
+
+                    View notifications
+
+                    <span>→</span>
+
+                </span>
+
+            </a>
+
+        </section>
+
+
+        <!-- INFO BANNER -->
+        <section class="bd-info-banner">
+
+            <div class="bd-info-symbol">
+                ⇄
+            </div>
+
+
+            <div class="bd-info-content">
+
+                <span>
+                    THE REVERSE SHOPPING WAY
+                </span>
+
+                <h3>
+                    You post. Sellers compete. You choose.
+                </h3>
+
+                <p>
+                    Compare available offers and select
+                    the one that suits your needs.
+                </p>
+
+            </div>
+
+
+            <a
+                href="/post-requirement/"
+                class="bd-info-button"
+            >
+                Get Started
+
+                <span>→</span>
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="bd-footer">
+
+        <div class="bd-footer-brand">
+
+            <span class="bd-footer-logo">
+                R
+            </span>
+
+            <strong>
+                Reverse Shopping
+            </strong>
+
+        </div>
+
+
+        <p>
+            Shopping begins with what you need.
+        </p>
+
+
+        <span>
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
+
 </html>

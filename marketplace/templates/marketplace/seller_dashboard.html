@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,55 +9,1777 @@
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+
+    <style>
+        /* =========================================
+           SELLER DASHBOARD - PREMIUM DESIGN
+        ========================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body.seller-dashboard-page {
+            margin: 0;
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 5% 10%,
+                    rgba(212, 175, 55, 0.08),
+                    transparent 25%
+                ),
+                #f8f5ed;
+
+            color: #171715;
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        .seller-dashboard-page a {
+            text-decoration: none;
+        }
+
+
+        /* =========================================
+           NAVBAR
+        ========================================= */
+
+        .sd-navbar {
+            min-height: 78px;
+
+            padding: 14px clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255, 255, 255, 0.97);
+
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .sd-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            color: #111111;
+        }
+
+        .sd-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 11px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .sd-brand-name {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .sd-brand-name strong {
+            color: #171715;
+
+            font-size: 15px;
+        }
+
+        .sd-brand-name small {
+            color: #928b7e;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            letter-spacing: 1.3px;
+
+            text-transform: uppercase;
+        }
+
+        .sd-nav-right {
+            display: flex;
+            align-items: center;
+
+            gap: 18px;
+        }
+
+        .sd-account {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color: #6e695f;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .sd-account-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            box-shadow:
+                0 0 0 4px rgba(212, 175, 55, 0.13);
+        }
+
+        .sd-logout {
+            padding: 9px 17px;
+
+            border: 1px solid #ddd5c7;
+            border-radius: 8px;
+
+            color: #191917;
+            background: #ffffff;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .sd-logout:hover {
+            background: #111111;
+            border-color: #111111;
+
+            color: #d4af37;
+        }
+
+
+        /* =========================================
+           HERO
+        ========================================= */
+
+        .sd-hero {
+            position: relative;
+
+            min-height: 480px;
+
+            padding:
+                65px
+                clamp(30px, 8vw, 125px);
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.05fr)
+                minmax(340px, 0.75fr);
+
+            align-items: center;
+
+            gap: clamp(45px, 8vw, 110px);
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 82% 20%,
+                    rgba(212, 175, 55, 0.12),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c 0%,
+                    #151512 58%,
+                    #1c1a13 100%
+                );
+
+            color: #ffffff;
+        }
+
+        .sd-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 430px;
+            height: 430px;
+
+            top: -270px;
+            left: -210px;
+
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 50%;
+        }
+
+        .sd-hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 520px;
+            height: 520px;
+
+            right: -340px;
+            bottom: -350px;
+
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+        }
+
+        .sd-hero-content {
+            position: relative;
+            z-index: 3;
+
+            max-width: 650px;
+        }
+
+        .sd-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #d8bd64;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2px;
+        }
+
+        .sd-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .sd-hero h1 {
+            margin: 18px 0 20px;
+
+            color: #ffffff;
+
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-size: clamp(45px, 5vw, 68px);
+            font-weight: 500;
+
+            line-height: 1;
+
+            letter-spacing: -2px;
+        }
+
+        .sd-hero h1 span {
+            color: #dfc66f;
+
+            font-style: italic;
+        }
+
+        .sd-hero-description {
+            max-width: 570px;
+
+            margin: 0;
+
+            color: #bcb8ae;
+
+            font-size: 14px;
+
+            line-height: 1.85;
+        }
+
+        .sd-hero-buttons {
+            margin-top: 30px;
+
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 12px;
+        }
+
+        .sd-primary-btn,
+        .sd-secondary-btn {
+            min-height: 48px;
+
+            padding: 12px 20px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 20px;
+
+            border-radius: 8px;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .sd-primary-btn {
+            background: #d4af37;
+            border: 1px solid #d4af37;
+
+            color: #111111;
+        }
+
+        .sd-primary-btn:hover {
+            transform: translateY(-2px);
+
+            background: #dfbd50;
+        }
+
+        .sd-primary-btn span {
+            font-size: 18px;
+        }
+
+        .sd-secondary-btn {
+            border: 1px solid #49463d;
+
+            background: rgba(255, 255, 255, 0.025);
+
+            color: #ded9cd;
+        }
+
+        .sd-secondary-btn:hover {
+            transform: translateY(-2px);
+
+            border-color: #a48b45;
+
+            color: #dfc66f;
+        }
+
+
+        /* =========================================
+           HERO VISUAL
+        ========================================= */
+
+        .sd-visual {
+            position: relative;
+            z-index: 3;
+
+            min-height: 350px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sd-circle-one,
+        .sd-circle-two {
+            position: absolute;
+
+            border-radius: 50%;
+
+            border: 1px solid rgba(212, 175, 55, 0.14);
+        }
+
+        .sd-circle-one {
+            width: 315px;
+            height: 315px;
+        }
+
+        .sd-circle-two {
+            width: 390px;
+            height: 390px;
+
+            border-color: rgba(212, 175, 55, 0.07);
+        }
+
+        .sd-workspace-card {
+            position: relative;
+            z-index: 4;
+
+            width: min(365px, 100%);
+
+            padding: 25px;
+
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #24231e,
+                    #151512
+                );
+
+            box-shadow:
+                0 30px 65px rgba(0, 0, 0, 0.36);
+        }
+
+        .sd-workspace-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding-bottom: 20px;
+
+            border-bottom:
+                1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .sd-workspace-head small {
+            color: #a39568;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.6px;
+        }
+
+        .sd-workspace-head h3 {
+            margin: 7px 0 0;
+
+            color: #ffffff;
+
+            font-family: Georgia, serif;
+
+            font-size: 22px;
+            font-weight: 500;
+
+            line-height: 1.3;
+        }
+
+        .sd-workspace-symbol {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            color: #111111;
+
+            font-size: 20px;
+        }
+
+        .sd-workspace-row {
+            min-height: 67px;
+
+            display: grid;
+
+            grid-template-columns:
+                auto 1fr auto;
+
+            align-items: center;
+
+            gap: 13px;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sd-workspace-row:last-child {
+            border-bottom: none;
+        }
+
+        .sd-row-number {
+            width: 32px;
+            height: 32px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background:
+                rgba(212, 175, 55, 0.1);
+
+            color: #dec56c;
+
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .sd-row-text {
+            display: flex;
+            flex-direction: column;
+
+            gap: 3px;
+        }
+
+        .sd-row-text small {
+            color: #79756b;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+        }
+
+        .sd-row-text strong {
+            color: #ebe7dd;
+
+            font-size: 11px;
+        }
+
+        .sd-row-arrow {
+            color: #d4af37;
+
+            font-size: 15px;
+        }
+
+        .sd-floating-note {
+            position: absolute;
+            z-index: 6;
+
+            right: -4px;
+            bottom: 2px;
+
+            padding: 12px 15px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            border:
+                1px solid rgba(212, 175, 55, 0.3);
+
+            border-radius: 11px;
+
+            background: #f8f5ed;
+
+            box-shadow:
+                0 18px 35px rgba(0, 0, 0, 0.28);
+        }
+
+        .sd-note-icon {
+            width: 32px;
+            height: 32px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-weight: 800;
+        }
+
+        .sd-floating-note div {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .sd-floating-note small {
+            color: #928873;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+        .sd-floating-note strong {
+            color: #28251e;
+
+            font-size: 10px;
+        }
+
+
+        /* =========================================
+           MAIN
+        ========================================= */
+
+        .sd-main {
+            width: min(1180px, 88%);
+
+            margin: 0 auto;
+
+            padding: 70px 0 80px;
+        }
+
+        .sd-section-heading {
+            margin-bottom: 31px;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+        }
+
+        .sd-section-label {
+            color: #947516;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 2px;
+        }
+
+        .sd-section-heading h2 {
+            margin: 8px 0;
+
+            color: #181816;
+
+            font-family: Georgia, serif;
+
+            font-size: clamp(30px, 3vw, 39px);
+            font-weight: 500;
+
+            letter-spacing: -1px;
+        }
+
+        .sd-section-heading p {
+            max-width: 580px;
+
+            margin: 0;
+
+            color: #777166;
+
+            font-size: 13px;
+
+            line-height: 1.75;
+        }
+
+        .sd-section-index {
+            color: #aaa294;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.4px;
+        }
+
+
+        /* =========================================
+           ACTION GRID
+        ========================================= */
+
+        .sd-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, minmax(0, 1fr));
+
+            gap: 15px;
+        }
+
+        .sd-action-card {
+            position: relative;
+
+            min-height: 290px;
+
+            grid-column: span 2;
+
+            padding: 24px;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow: hidden;
+
+            border: 1px solid #e7e0d2;
+            border-radius: 14px;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            color: #181816;
+
+            box-shadow:
+                0 10px 35px rgba(35, 30, 20, 0.04);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .sd-action-card:hover {
+            transform: translateY(-5px);
+
+            border-color: #d7c68a;
+
+            box-shadow:
+                0 20px 45px rgba(35, 30, 20, 0.09);
+        }
+
+        .sd-featured {
+            min-height: 315px;
+
+            grid-column: span 4;
+
+            border-color: #292820;
+
+            background:
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(212, 175, 55, 0.12),
+                    transparent 30%
+                ),
+                #171715;
+
+            color: #ffffff;
+        }
+
+        .sd-wide-card {
+            grid-column: span 4;
+        }
+
+        .sd-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .sd-card-icon {
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #f4edda;
+
+            color: #876a12;
+
+            font-family: Georgia, serif;
+
+            font-size: 19px;
+        }
+
+        .sd-featured .sd-card-icon {
+            background: #d4af37;
+
+            color: #111111;
+        }
+
+        .sd-card-number {
+            color: #b3ac9e;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+        }
+
+        .sd-featured .sd-card-number {
+            color: #746e5b;
+        }
+
+        .sd-card-body {
+            margin-top: 30px;
+        }
+
+        .sd-card-label {
+            color: #947516;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+        }
+
+        .sd-featured .sd-card-label {
+            color: #d4af37;
+        }
+
+        .sd-card-body h3 {
+            margin: 8px 0 10px;
+
+            color: #1a1916;
+
+            font-family: Georgia, serif;
+
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .sd-featured .sd-card-body h3 {
+            color: #ffffff;
+
+            font-size: 27px;
+        }
+
+        .sd-card-body p {
+            max-width: 500px;
+
+            margin: 0;
+
+            color: #777166;
+
+            font-size: 12px;
+
+            line-height: 1.75;
+        }
+
+        .sd-featured .sd-card-body p {
+            color: #aaa69c;
+        }
+
+        .sd-card-link {
+            margin-top: auto;
+            padding-top: 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            border-top: 1px solid #eee9df;
+
+            color: #403c34;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .sd-featured .sd-card-link {
+            border-color: #343229;
+
+            color: #d7d2c6;
+        }
+
+        .sd-card-arrow {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-size: 14px;
+
+            transition: transform 0.2s ease;
+        }
+
+        .sd-featured .sd-card-arrow {
+            background: #d4af37;
+
+            color: #111111;
+        }
+
+        .sd-action-card:hover .sd-card-arrow {
+            transform: translateX(3px);
+        }
+
+
+        /* =========================================
+           BOTTOM PREMIUM BANNER
+        ========================================= */
+
+        .sd-banner {
+            margin-top: 55px;
+
+            padding: 34px 36px;
+
+            display: grid;
+
+            grid-template-columns:
+                auto 1fr auto;
+
+            align-items: center;
+
+            gap: 30px;
+
+            overflow: hidden;
+
+            border: 1px solid #27251f;
+            border-radius: 15px;
+
+            background:
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(212, 175, 55, 0.13),
+                    transparent 30%
+                ),
+                #11110f;
+
+            color: #ffffff;
+        }
+
+        .sd-banner-number {
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid #4b4328;
+
+            border-radius: 50%;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+
+            font-size: 18px;
+        }
+
+        .sd-banner-content span {
+            color: #a78d40;
+
+            font-size: 8px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+        }
+
+        .sd-banner-content h3 {
+            margin: 6px 0 7px;
+
+            color: #ffffff;
+
+            font-family: Georgia, serif;
+
+            font-size: 20px;
+            font-weight: 500;
+
+            line-height: 1.35;
+        }
+
+        .sd-banner-content h3 em {
+            color: #dec56c;
+
+            font-weight: 500;
+        }
+
+        .sd-banner-content p {
+            margin: 0;
+
+            color: #99958b;
+
+            font-size: 11px;
+
+            line-height: 1.6;
+        }
+
+        .sd-banner-btn {
+            padding: 12px 17px;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: 18px;
+
+            border: 1px solid #474338;
+            border-radius: 8px;
+
+            color: #e2ddd1;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .sd-banner-btn:hover {
+            background: #d4af37;
+
+            border-color: #d4af37;
+
+            color: #111111;
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .sd-footer {
+            padding:
+                27px
+                clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            border-top: 1px solid #e7e0d2;
+
+            background: #ffffff;
+        }
+
+        .sd-footer-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .sd-footer-logo {
+            width: 33px;
+            height: 33px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .sd-footer-brand div {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .sd-footer-brand strong {
+            color: #181816;
+
+            font-size: 12px;
+        }
+
+        .sd-footer-brand small {
+            color: #9a9387;
+
+            font-size: 7px;
+            font-weight: 700;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+        }
+
+        .sd-footer p {
+            margin: 0;
+
+            color: #817b70;
+
+            font-size: 10px;
+        }
+
+        .sd-footer-copy {
+            color: #9b9488;
+
+            font-size: 9px;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 1000px) {
+
+            .sd-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .sd-visual {
+                width: min(500px, 100%);
+
+                margin: 0 auto;
+            }
+
+            .sd-action-card,
+            .sd-featured,
+            .sd-wide-card {
+                grid-column: span 3;
+            }
+        }
+
+
+        @media (max-width: 720px) {
+
+            .sd-navbar {
+                padding: 12px 5%;
+            }
+
+            .sd-account,
+            .sd-brand-name small {
+                display: none;
+            }
+
+            .sd-hero {
+                min-height: auto;
+
+                padding:
+                    48px
+                    6%;
+            }
+
+            .sd-hero h1 {
+                font-size: 43px;
+            }
+
+            .sd-visual {
+                min-height: 320px;
+            }
+
+            .sd-workspace-card {
+                width: 94%;
+            }
+
+            .sd-main {
+                width: 90%;
+
+                padding: 50px 0 60px;
+            }
+
+            .sd-section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+
+                gap: 10px;
+            }
+
+            .sd-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sd-action-card,
+            .sd-featured,
+            .sd-wide-card {
+                grid-column: auto;
+
+                min-height: 270px;
+            }
+
+            .sd-banner {
+                grid-template-columns: 1fr;
+
+                padding: 27px 23px;
+            }
+
+            .sd-banner-btn {
+                width: fit-content;
+            }
+
+            .sd-footer {
+                align-items: flex-start;
+                flex-direction: column;
+
+                padding: 25px 6%;
+            }
+        }
+
+
+        @media (max-width: 450px) {
+
+            .sd-brand-name strong {
+                font-size: 13px;
+            }
+
+            .sd-hero-buttons {
+                flex-direction: column;
+            }
+
+            .sd-primary-btn,
+            .sd-secondary-btn {
+                width: 100%;
+            }
+
+            .sd-floating-note {
+                display: none;
+            }
+
+            .sd-circle-one {
+                width: 270px;
+                height: 270px;
+            }
+
+            .sd-circle-two {
+                width: 325px;
+                height: 325px;
+            }
+
+            .sd-section-heading h2 {
+                font-size: 29px;
+            }
+        }
+    </style>
 </head>
 
-<body>
 
-    <div class="top-bar">
-        <h1>Seller Dashboard</h1>
-        <p>Welcome, {{ seller.name }}</p>
-    </div>
+<body class="seller-dashboard-page">
 
-    <div class="container">
+    <!-- NAVBAR -->
+    <nav class="sd-navbar">
 
-        <div class="card">
-            <h2>Manage Your Selling Activities</h2>
+        <a href="/" class="sd-brand">
 
-            <p>
-                View matching buyer requirements, submit competitive offers,
-                and manage your submitted offers.
+            <span class="sd-logo">R</span>
+
+            <span class="sd-brand-name">
+                <strong>Reverse Shopping</strong>
+                <small>Seller Workspace</small>
+            </span>
+
+        </a>
+
+
+        <div class="sd-nav-right">
+
+            <div class="sd-account">
+                <span class="sd-account-dot"></span>
+                <span>Seller Account</span>
+            </div>
+
+            <a href="/logout/" class="sd-logout">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="sd-hero">
+
+        <div class="sd-hero-content">
+
+            <span class="sd-eyebrow">
+                SELLER DASHBOARD
+            </span>
+
+            <h1>
+                Welcome back,<br>
+                <span>{{ seller.name }}</span>
+            </h1>
+
+            <p class="sd-hero-description">
+                Discover buyer requirements, submit competitive offers
+                and manage your selling activity from one refined
+                marketplace workspace.
             </p>
 
-            <div class="actions">
 
-                <a href="/buyer-requirements/">
-                    <button>View Buyer Requirements</button>
+            <div class="sd-hero-buttons">
+
+                <a href="/buyer-requirements/"
+                   class="sd-primary-btn">
+
+                    Explore Buyer Requirements
+
+                    <span>→</span>
+
                 </a>
 
-                <a href="/my-offers/">
-                    <button>My Offers</button>
-                </a>
 
-                <a href="/selected-orders/">
-                    <button>Selected Orders</button>
-                </a>
+                <a href="/my-offers/"
+                   class="sd-secondary-btn">
 
-                <a href="/profile/">
-                    <button>My Profile</button>
-                </a>
-                
-                <a href="/notifications/">
-                    <button>🔔 Notifications</button>
-                </a>
+                    View My Offers
 
-                <a href="/logout/">
-                    <button>Logout</button>
                 </a>
 
             </div>
+
         </div>
 
-    </div>
+
+        <!-- PREMIUM VISUAL -->
+        <div class="sd-visual">
+
+            <div class="sd-circle-one"></div>
+            <div class="sd-circle-two"></div>
+
+
+            <div class="sd-workspace-card">
+
+                <div class="sd-workspace-head">
+
+                    <div>
+                        <small>SELLER WORKSPACE</small>
+
+                        <h3>
+                            Compete with<br>
+                            better offers.
+                        </h3>
+                    </div>
+
+                    <div class="sd-workspace-symbol">
+                        ⇄
+                    </div>
+
+                </div>
+
+
+                <div class="sd-workspace-row">
+
+                    <span class="sd-row-number">
+                        01
+                    </span>
+
+                    <div class="sd-row-text">
+                        <small>DISCOVER</small>
+                        <strong>Buyer Requests</strong>
+                    </div>
+
+                    <span class="sd-row-arrow">
+                        →
+                    </span>
+
+                </div>
+
+
+                <div class="sd-workspace-row">
+
+                    <span class="sd-row-number">
+                        02
+                    </span>
+
+                    <div class="sd-row-text">
+                        <small>COMPETE</small>
+                        <strong>Submit Offers</strong>
+                    </div>
+
+                    <span class="sd-row-arrow">
+                        →
+                    </span>
+
+                </div>
+
+
+                <div class="sd-workspace-row">
+
+                    <span class="sd-row-number">
+                        03
+                    </span>
+
+                    <div class="sd-row-text">
+                        <small>MANAGE</small>
+                        <strong>Selected Orders</strong>
+                    </div>
+
+                    <span class="sd-row-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="sd-floating-note">
+
+                <span class="sd-note-icon">
+                    ₹
+                </span>
+
+                <div>
+                    <small>REVERSE SHOPPING</small>
+                    <strong>Your offer matters.</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="sd-main">
+
+        <section class="sd-section-heading">
+
+            <div>
+
+                <span class="sd-section-label">
+                    YOUR WORKSPACE
+                </span>
+
+                <h2>
+                    Manage your selling activity
+                </h2>
+
+                <p>
+                    Everything you need to discover buyer opportunities,
+                    manage offers and follow selected orders.
+                </p>
+
+            </div>
+
+            <span class="sd-section-index">
+                01 / SELLER
+            </span>
+
+        </section>
+
+
+        <!-- ACTION CARDS -->
+        <section class="sd-grid">
+
+
+            <!-- BUYER REQUIREMENTS -->
+            <a href="/buyer-requirements/"
+               class="sd-action-card sd-featured">
+
+                <div class="sd-card-top">
+
+                    <span class="sd-card-icon">
+                        ⇄
+                    </span>
+
+                    <span class="sd-card-number">
+                        01
+                    </span>
+
+                </div>
+
+
+                <div class="sd-card-body">
+
+                    <span class="sd-card-label">
+                        DISCOVER
+                    </span>
+
+                    <h3>
+                        Buyer Requirements
+                    </h3>
+
+                    <p>
+                        Browse matching buyer requests and discover
+                        new opportunities to submit competitive offers.
+                    </p>
+
+                </div>
+
+
+                <div class="sd-card-link">
+
+                    <span>
+                        Explore requirements
+                    </span>
+
+                    <span class="sd-card-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- MY OFFERS -->
+            <a href="/my-offers/"
+               class="sd-action-card">
+
+                <div class="sd-card-top">
+
+                    <span class="sd-card-icon">
+                        ₹
+                    </span>
+
+                    <span class="sd-card-number">
+                        02
+                    </span>
+
+                </div>
+
+
+                <div class="sd-card-body">
+
+                    <span class="sd-card-label">
+                        OFFERS
+                    </span>
+
+                    <h3>
+                        My Offers
+                    </h3>
+
+                    <p>
+                        Review your submitted offers and update
+                        pricing, delivery or offer information.
+                    </p>
+
+                </div>
+
+
+                <div class="sd-card-link">
+
+                    <span>
+                        Manage offers
+                    </span>
+
+                    <span class="sd-card-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- SELECTED ORDERS -->
+            <a href="/selected-orders/"
+               class="sd-action-card">
+
+                <div class="sd-card-top">
+
+                    <span class="sd-card-icon">
+                        ✓
+                    </span>
+
+                    <span class="sd-card-number">
+                        03
+                    </span>
+
+                </div>
+
+
+                <div class="sd-card-body">
+
+                    <span class="sd-card-label">
+                        ORDERS
+                    </span>
+
+                    <h3>
+                        Selected Orders
+                    </h3>
+
+                    <p>
+                        View orders where buyers selected your
+                        offer and review their current status.
+                    </p>
+
+                </div>
+
+
+                <div class="sd-card-link">
+
+                    <span>
+                        View orders
+                    </span>
+
+                    <span class="sd-card-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- PROFILE -->
+            <a href="/profile/"
+               class="sd-action-card">
+
+                <div class="sd-card-top">
+
+                    <span class="sd-card-icon">
+                        ◇
+                    </span>
+
+                    <span class="sd-card-number">
+                        04
+                    </span>
+
+                </div>
+
+
+                <div class="sd-card-body">
+
+                    <span class="sd-card-label">
+                        ACCOUNT
+                    </span>
+
+                    <h3>
+                        My Profile
+                    </h3>
+
+                    <p>
+                        Keep your seller information and selling
+                        category accurate and up to date.
+                    </p>
+
+                </div>
+
+
+                <div class="sd-card-link">
+
+                    <span>
+                        Manage profile
+                    </span>
+
+                    <span class="sd-card-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- NOTIFICATIONS -->
+            <a href="/notifications/"
+               class="sd-action-card sd-wide-card">
+
+                <div class="sd-card-top">
+
+                    <span class="sd-card-icon">
+                        ◉
+                    </span>
+
+                    <span class="sd-card-number">
+                        05
+                    </span>
+
+                </div>
+
+
+                <div class="sd-card-body">
+
+                    <span class="sd-card-label">
+                        UPDATES
+                    </span>
+
+                    <h3>
+                        Notifications
+                    </h3>
+
+                    <p>
+                        Stay informed about buyer activity,
+                        selected offers and important marketplace updates.
+                    </p>
+
+                </div>
+
+
+                <div class="sd-card-link">
+
+                    <span>
+                        View notifications
+                    </span>
+
+                    <span class="sd-card-arrow">
+                        →
+                    </span>
+
+                </div>
+
+            </a>
+
+        </section>
+
+
+        <!-- PREMIUM BANNER -->
+        <section class="sd-banner">
+
+            <div class="sd-banner-number">
+                02
+            </div>
+
+
+            <div class="sd-banner-content">
+
+                <span>
+                    THE REVERSE SHOPPING MODEL
+                </span>
+
+                <h3>
+                    Buyers ask. Sellers compete.
+                    <em>The right offer stands out.</em>
+                </h3>
+
+                <p>
+                    Understand the buyer's requirement and compete
+                    through price, delivery and product value.
+                </p>
+
+            </div>
+
+
+            <a href="/buyer-requirements/"
+               class="sd-banner-btn">
+
+                Find Requirements
+
+                <span>→</span>
+
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="sd-footer">
+
+        <div class="sd-footer-brand">
+
+            <span class="sd-footer-logo">
+                R
+            </span>
+
+            <div>
+                <strong>Reverse Shopping</strong>
+                <small>Seller Marketplace</small>
+            </div>
+
+        </div>
+
+
+        <p>
+            Better offers begin with understanding what buyers need.
+        </p>
+
+
+        <span class="sd-footer-copy">
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
+
 </html>

@@ -7,66 +7,1117 @@
 
     <title>Notifications - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 5% 8%,
+                    rgba(212, 175, 55, 0.08),
+                    transparent 22%
+                ),
+                #f8f5ed;
+
+            color: #191917;
+
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           NAVBAR
+        ===================================== */
+
+        .nt-navbar {
+            min-height: 78px;
+
+            padding:
+                14px
+                clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            background: rgba(255, 255, 255, 0.97);
+
+            border-bottom:
+                1px solid #e7e0d2;
+        }
+
+        .nt-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            color: #111111;
+        }
+
+        .nt-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .nt-brand-copy {
+            display: flex;
+            flex-direction: column;
+
+            gap: 2px;
+        }
+
+        .nt-brand-copy strong {
+            font-size: 15px;
+        }
+
+        .nt-brand-copy small {
+            color: #928b7e;
+
+            font-size: 8px;
+            font-weight: 700;
+
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .nt-nav-right {
+            display: flex;
+            align-items: center;
+
+            gap: 18px;
+        }
+
+        .nt-account-label {
+            color: #716b60;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .nt-account-label::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            display: inline-block;
+
+            margin-right: 8px;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+
+            box-shadow:
+                0 0 0 4px
+                rgba(212, 175, 55, 0.13);
+        }
+
+        .nt-dashboard-link {
+            padding: 9px 16px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            color: #28251f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: 0.2s ease;
+        }
+
+        .nt-dashboard-link:hover {
+            background: #111111;
+            border-color: #111111;
+
+            color: #d4af37;
+        }
+
+        /* =====================================
+           HERO
+        ===================================== */
+
+        .nt-hero {
+            position: relative;
+
+            min-height: 355px;
+
+            padding:
+                58px
+                clamp(30px, 8vw, 125px);
+
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                auto;
+
+            align-items: center;
+
+            gap: 65px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 83% 25%,
+                    rgba(212, 175, 55, 0.14),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    115deg,
+                    #0d0d0c,
+                    #151512 58%,
+                    #1c1a13
+                );
+
+            color: #ffffff;
+        }
+
+        .nt-hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 400px;
+            height: 400px;
+
+            right: -170px;
+            top: -240px;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.13);
+
+            border-radius: 50%;
+        }
+
+        .nt-hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 680px;
+        }
+
+        .nt-eyebrow {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #dfc66f;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 2.2px;
+        }
+
+        .nt-eyebrow::before {
+            content: "";
+
+            width: 28px;
+            height: 1px;
+
+            background: #d4af37;
+        }
+
+        .nt-hero h1 {
+            margin: 17px 0 18px;
+
+            font-family: Georgia, serif;
+
+            font-size:
+                clamp(45px, 5vw, 65px);
+
+            font-weight: 500;
+
+            line-height: 1;
+
+            letter-spacing: -2px;
+        }
+
+        .nt-hero h1 span {
+            color: #dfc66f;
+
+            font-style: italic;
+        }
+
+        .nt-hero p {
+            max-width: 570px;
+
+            margin: 0;
+
+            color: #bcb8ae;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+        /* =====================================
+           HERO NOTIFICATION VISUAL
+        ===================================== */
+
+        .nt-hero-visual {
+            position: relative;
+            z-index: 2;
+
+            width: 200px;
+            height: 200px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.22);
+
+            border-radius: 50%;
+        }
+
+        .nt-hero-visual::before {
+            content: "";
+
+            position: absolute;
+
+            width: 150px;
+            height: 150px;
+
+            border:
+                1px solid
+                rgba(212, 175, 55, 0.11);
+
+            border-radius: 50%;
+        }
+
+        .nt-bell-card {
+            position: relative;
+            z-index: 2;
+
+            width: 88px;
+            height: 88px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background: #22211c;
+
+            color: #d4af37;
+
+            box-shadow:
+                0 20px 50px
+                rgba(0, 0, 0, 0.35);
+
+            font-size: 28px;
+        }
+
+        .nt-bell-dot {
+            position: absolute;
+
+            width: 12px;
+            height: 12px;
+
+            right: 17px;
+            top: 16px;
+
+            border: 3px solid #22211c;
+            border-radius: 50%;
+
+            background: #d4af37;
+        }
+
+        /* =====================================
+           MAIN
+        ===================================== */
+
+        .nt-main {
+            width: min(950px, 90%);
+
+            margin: 0 auto;
+
+            padding: 65px 0 80px;
+        }
+
+        .nt-section-heading {
+            margin-bottom: 28px;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 25px;
+        }
+
+        .nt-section-label {
+            color: #967616;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            letter-spacing: 1.8px;
+        }
+
+        .nt-section-heading h2 {
+            margin: 7px 0 8px;
+
+            font-family: Georgia, serif;
+
+            font-size:
+                clamp(29px, 3vw, 39px);
+
+            font-weight: 500;
+
+            letter-spacing: -1px;
+        }
+
+        .nt-section-heading p {
+            margin: 0;
+
+            color: #797267;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        /* =====================================
+           NOTIFICATION CARD
+        ===================================== */
+
+        .nt-panel {
+            overflow: hidden;
+
+            border: 1px solid #e2dacb;
+            border-radius: 17px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 15px 45px
+                rgba(35, 30, 20, 0.055);
+        }
+
+        .nt-panel-header {
+            padding: 24px 29px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            background: #171715;
+
+            color: #ffffff;
+        }
+
+        .nt-panel-header small {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #a98b32;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+        }
+
+        .nt-panel-header h3 {
+            margin: 0;
+
+            font-family: Georgia, serif;
+
+            font-size: 21px;
+            font-weight: 500;
+        }
+
+        .nt-panel-icon {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border:
+                1px solid #50482d;
+
+            border-radius: 50%;
+
+            color: #d4af37;
+
+            font-size: 15px;
+        }
+
+        /* =====================================
+           NOTIFICATION LIST
+        ===================================== */
+
+        .nt-list {
+            padding: 12px 29px 20px;
+        }
+
+        .nt-notification {
+            position: relative;
+
+            padding: 22px 5px 22px 55px;
+
+            border-bottom:
+                1px solid #eee8dd;
+        }
+
+        .nt-notification:last-child {
+            border-bottom: none;
+        }
+
+        .nt-notification-icon {
+            position: absolute;
+
+            left: 2px;
+            top: 22px;
+
+            width: 37px;
+            height: 37px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #e0d5b7;
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #faf6e9,
+                    #f5eedb
+                );
+
+            color: #8a6c16;
+
+            font-family: Georgia, serif;
+            font-size: 15px;
+        }
+
+        .nt-notification-top {
+            margin-bottom: 7px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .nt-notification-title {
+            color: #8c6f1b;
+
+            font-size: 7px;
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .nt-notification-number {
+            color: #c2b9a8;
+
+            font-family: Georgia, serif;
+            font-size: 12px;
+        }
+
+        .nt-notification p {
+            margin: 0 0 8px;
+
+            color: #403c35;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        .nt-notification time {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 7px;
+
+            color: #999184;
+
+            font-size: 8px;
+            font-weight: 600;
+        }
+
+        .nt-notification time::before {
+            content: "";
+
+            width: 5px;
+            height: 5px;
+
+            display: inline-block;
+
+            border-radius: 50%;
+
+            background: #d4af37;
+        }
+
+        /* =====================================
+           EMPTY STATE
+        ===================================== */
+
+        .nt-empty {
+            padding: 70px 30px;
+
+            text-align: center;
+        }
+
+        .nt-empty-icon {
+            position: relative;
+
+            width: 64px;
+            height: 64px;
+
+            margin: 0 auto 19px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #171715;
+
+            color: #d4af37;
+
+            font-size: 22px;
+        }
+
+        .nt-empty h3 {
+            margin: 0 0 9px;
+
+            font-family: Georgia, serif;
+
+            font-size: 25px;
+            font-weight: 500;
+        }
+
+        .nt-empty p {
+            max-width: 420px;
+
+            margin: 0 auto;
+
+            color: #817a6e;
+
+            font-size: 11px;
+
+            line-height: 1.7;
+        }
+
+        /* =====================================
+           BACK BUTTON
+        ===================================== */
+
+        .nt-back-area {
+            margin-top: 31px;
+        }
+
+        .nt-back {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 10px;
+
+            color: #3e3931;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .nt-back span {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #111111;
+
+            color: #d4af37;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .nt-footer {
+            padding:
+                27px
+                clamp(24px, 6vw, 95px);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            border-top:
+                1px solid #e7e0d2;
+
+            background: #ffffff;
+        }
+
+        .nt-footer-brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .nt-footer-logo {
+            width: 33px;
+            height: 33px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #111111;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .nt-footer-brand strong {
+            font-size: 12px;
+        }
+
+        .nt-footer p,
+        .nt-footer > span {
+            margin: 0;
+
+            color: #817b70;
+
+            font-size: 9px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 800px) {
+            .nt-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .nt-hero-visual {
+                display: none;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .nt-navbar {
+                padding: 12px 5%;
+            }
+
+            .nt-account-label {
+                display: none;
+            }
+
+            .nt-brand-copy small {
+                display: none;
+            }
+
+            .nt-hero {
+                min-height: 320px;
+
+                padding: 48px 6%;
+            }
+
+            .nt-hero h1 {
+                font-size: 43px;
+            }
+
+            .nt-main {
+                width: 92%;
+
+                padding: 48px 0 60px;
+            }
+
+            .nt-section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nt-list {
+                padding-left: 21px;
+                padding-right: 21px;
+            }
+
+            .nt-footer {
+                padding: 25px 6%;
+
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .nt-brand-copy strong {
+                font-size: 13px;
+            }
+
+            .nt-dashboard-link {
+                padding: 8px 10px;
+            }
+
+            .nt-panel-header {
+                padding: 22px;
+            }
+
+            .nt-notification {
+                padding-left: 48px;
+            }
+
+            .nt-notification-icon {
+                width: 33px;
+                height: 33px;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-    <div class="top-bar">
-        <h1>Notifications 🔔</h1>
-        <p>Your latest updates</p>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="nt-navbar">
 
-    <div class="container">
+        <a href="/" class="nt-brand">
 
-        <div class="card">
+            <span class="nt-logo">
+                R
+            </span>
 
-            {% if notifications %}
+            <span class="nt-brand-copy">
 
-                {% for notification in notifications %}
+                <strong>
+                    Reverse Shopping
+                </strong>
 
-                    <div class="notification">
+                <small>
+                    Notifications
+                </small>
 
-                        <p>
-                            {{ notification.message }}
-                        </p>
+            </span>
 
-                        <small>
-                            {{ notification.created_at|date:"d M Y, h:i A" }}
-                        </small>
+        </a>
 
-                    </div>
 
-                    <hr>
+        <div class="nt-nav-right">
 
-                {% endfor %}
+            <span class="nt-account-label">
 
-            {% else %}
+                {% if request.session.user_role == 'buyer' %}
+                    Buyer Account
+                {% elif request.session.user_role == 'seller' %}
+                    Seller Account
+                {% else %}
+                    My Account
+                {% endif %}
 
-                <p>No notifications yet.</p>
+            </span>
 
-            {% endif %}
-
-            <br>
 
             {% if request.session.user_role == 'buyer' %}
 
-                <a href="/buyer/">
-                    <button>Back to Dashboard</button>
+                <a
+                    href="/buyer/"
+                    class="nt-dashboard-link"
+                >
+                    Dashboard
                 </a>
 
             {% elif request.session.user_role == 'seller' %}
 
-                <a href="/seller/">
-                    <button>Back to Dashboard</button>
+                <a
+                    href="/seller/"
+                    class="nt-dashboard-link"
+                >
+                    Dashboard
                 </a>
 
             {% endif %}
 
         </div>
 
-    </div>
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="nt-hero">
+
+        <div class="nt-hero-content">
+
+            <span class="nt-eyebrow">
+                ACCOUNT UPDATES
+            </span>
+
+            <h1>
+                Stay up to date<br>
+                <span>with every update.</span>
+            </h1>
+
+            <p>
+                View the latest notifications related to
+                your Reverse Shopping account, requirements,
+                offers and activity.
+            </p>
+
+        </div>
+
+
+        <div class="nt-hero-visual">
+
+            <div class="nt-bell-card">
+
+                ♢
+
+                <span class="nt-bell-dot"></span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="nt-main">
+
+        <div class="nt-section-heading">
+
+            <div>
+
+                <span class="nt-section-label">
+                    LATEST ACTIVITY
+                </span>
+
+                <h2>
+                    Notifications
+                </h2>
+
+                <p>
+                    Your latest Reverse Shopping updates
+                    are shown below.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTIFICATION PANEL -->
+        <section class="nt-panel">
+
+            <div class="nt-panel-header">
+
+                <div>
+
+                    <small>
+                        NOTIFICATION CENTRE
+                    </small>
+
+                    <h3>
+                        Your Updates
+                    </h3>
+
+                </div>
+
+
+                <span class="nt-panel-icon">
+                    ◇
+                </span>
+
+            </div>
+
+
+            {% if notifications %}
+
+                <div class="nt-list">
+
+                    {% for notification in notifications %}
+
+                        <article class="nt-notification">
+
+                            <div class="nt-notification-icon">
+                                ◇
+                            </div>
+
+
+                            <div class="nt-notification-top">
+
+                                <span class="nt-notification-title">
+                                    Notification
+                                </span>
+
+                                <span class="nt-notification-number">
+                                    {{ forloop.counter|stringformat:"02d" }}
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                {{ notification.message }}
+                            </p>
+
+
+                            <time>
+                                {{ notification.created_at|date:"d M Y, h:i A" }}
+                            </time>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="nt-empty">
+
+                    <div class="nt-empty-icon">
+                        ◇
+                    </div>
+
+                    <h3>
+                        No notifications yet
+                    </h3>
+
+                    <p>
+                        There are no updates for your account
+                        at the moment. New notifications will
+                        appear here when available.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- BACK TO CORRECT DASHBOARD -->
+        <div class="nt-back-area">
+
+            {% if request.session.user_role == 'buyer' %}
+
+                <a
+                    href="/buyer/"
+                    class="nt-back"
+                >
+                    <span>
+                        ←
+                    </span>
+
+                    Back to Buyer Dashboard
+                </a>
+
+
+            {% elif request.session.user_role == 'seller' %}
+
+                <a
+                    href="/seller/"
+                    class="nt-back"
+                >
+                    <span>
+                        ←
+                    </span>
+
+                    Back to Seller Dashboard
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="nt-footer">
+
+        <div class="nt-footer-brand">
+
+            <span class="nt-footer-logo">
+                R
+            </span>
+
+            <strong>
+                Reverse Shopping
+            </strong>
+
+        </div>
+
+
+        <p>
+            Stay informed. Stay connected.
+        </p>
+
+
+        <span>
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
 

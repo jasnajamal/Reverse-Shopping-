@@ -1,260 +1,1345 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Buyer Requirements - Reverse Shopping</title>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 5% 8%, rgba(212,175,55,.08), transparent 22%),
+                #f8f5ed;
+            color: #191917;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .sr-navbar {
+            min-height: 78px;
+            padding: 14px clamp(24px, 6vw, 95px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            background: rgba(255,255,255,.97);
+            border-bottom: 1px solid #e7e0d2;
+        }
+
+        .sr-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #111;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .sr-logo-mark {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #111;
+            color: #d4af37;
+            font-family: Georgia, serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .sr-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sr-brand-text small {
+            color: #928b7e;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .sr-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .sr-account-label {
+            color: #716b60;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .sr-account-label::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            display: inline-block;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: #d4af37;
+            box-shadow: 0 0 0 4px rgba(212,175,55,.13);
+        }
+
+        .sr-logout {
+            padding: 9px 17px;
+            border: 1px solid #dcd5c8;
+            border-radius: 8px;
+            color: #1b1b19;
+            font-size: 11px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .sr-logout:hover {
+            background: #111;
+            border-color: #111;
+            color: #d4af37;
+        }
+
+        /* ================= HERO ================= */
+
+        .sr-page-header {
+            position: relative;
+            min-height: 410px;
+            padding: 60px clamp(30px, 8vw, 125px);
+            display: grid;
+            grid-template-columns: minmax(0,1.15fr) minmax(330px,.65fr);
+            align-items: center;
+            gap: 70px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 82% 20%, rgba(212,175,55,.14), transparent 25%),
+                linear-gradient(115deg,#0d0d0c,#151512 58%,#1c1a13);
+            color: #fff;
+        }
+
+        .sr-page-header::before {
+            content: "";
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            left: -260px;
+            top: -260px;
+            border: 1px solid rgba(212,175,55,.15);
+            border-radius: 50%;
+        }
+
+        .sr-header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 670px;
+        }
+
+        .sr-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #dfc66f;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2.2px;
+        }
+
+        .sr-eyebrow::before {
+            content: "";
+            width: 28px;
+            height: 1px;
+            background: #d4af37;
+        }
+
+        .sr-header-content h1 {
+            margin: 17px 0 18px;
+            color: #fff;
+            font-family: Georgia, serif;
+            font-size: clamp(45px,5vw,67px);
+            font-weight: 500;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .sr-header-content > p {
+            max-width: 570px;
+            margin: 0;
+            color: #bcb8ae;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .sr-seller-badge {
+            width: fit-content;
+            margin-top: 27px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            border: 1px solid #3b392f;
+            border-radius: 30px;
+            background: rgba(255,255,255,.035);
+            color: #d7d1c4;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .sr-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #d4af37;
+        }
+
+        /* ================= HERO ART ================= */
+
+        .sr-header-art {
+            position: relative;
+            z-index: 2;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sr-art-circle {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgba(212,175,55,.13);
+            border-radius: 50%;
+        }
+
+        .sr-art-card {
+            position: relative;
+            width: min(330px,100%);
+            padding: 28px;
+            border: 1px solid rgba(212,175,55,.27);
+            border-radius: 16px;
+            background: linear-gradient(145deg,#24231e,#151512);
+            box-shadow: 0 28px 60px rgba(0,0,0,.35);
+        }
+
+        .sr-art-symbol {
+            width: 43px;
+            height: 43px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #d4af37;
+            color: #111;
+            font-size: 20px;
+        }
+
+        .sr-art-small {
+            color: #a59561;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.6px;
+        }
+
+        .sr-art-card h3 {
+            margin: 8px 0 18px;
+            color: #fff;
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .sr-art-line {
+            height: 1px;
+            background: linear-gradient(90deg,rgba(212,175,55,.45),transparent);
+        }
+
+        .sr-art-card p {
+            margin: 16px 0 0;
+            color: #88847b;
+            font-size: 10px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .sr-main {
+            width: min(1180px,90%);
+            margin: 0 auto;
+            padding: 70px 0 80px;
+        }
+
+        .sr-section-heading {
+            margin-bottom: 32px;
+        }
+
+        .sr-section-eyebrow {
+            color: #967616;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .sr-section-heading h2 {
+            margin: 8px 0;
+            font-family: Georgia, serif;
+            font-size: clamp(30px,3vw,40px);
+            font-weight: 500;
+            letter-spacing: -1px;
+        }
+
+        .sr-section-heading p {
+            margin: 0;
+            color: #777166;
+            font-size: 13px;
+        }
+
+        .sr-requirements-list {
+            display: grid;
+            gap: 30px;
+        }
+
+        /* ================= REQUIREMENT CARD ================= */
+
+        .sr-requirement-card {
+            overflow: hidden;
+            border: 1px solid #e4dccd;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 14px 45px rgba(35,30,20,.055);
+        }
+
+        .sr-card-heading {
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: #171715;
+        }
+
+        .sr-card-eyebrow {
+            color: #a98b32;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .sr-card-heading h2 {
+            margin: 6px 0 0;
+            color: #fff;
+            font-family: Georgia, serif;
+            font-size: 27px;
+            font-weight: 500;
+        }
+
+        .sr-request-label {
+            padding: 8px 12px;
+            border: 1px solid #4a432d;
+            border-radius: 30px;
+            color: #dfc66f;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .6px;
+        }
+
+        /* ================= DETAILS ================= */
+
+        .sr-details-grid {
+            padding: 30px 32px;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 13px;
+        }
+
+        .sr-detail-item {
+            min-height: 91px;
+            padding: 17px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid #ebe5da;
+            border-radius: 11px;
+            background: #fcfbf8;
+        }
+
+        .sr-budget-detail {
+            background: #f8f2df;
+            border-color: #e4d29c;
+        }
+
+        .sr-detail-label {
+            color: #989082;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .sr-detail-item strong {
+            color: #24221e;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .sr-budget-detail strong {
+            color: #80620c;
+            font-family: Georgia, serif;
+            font-size: 19px;
+        }
+
+        .sr-description-box {
+            margin: 0 32px 30px;
+            padding: 20px;
+            border-left: 3px solid #d4af37;
+            background: #faf8f2;
+        }
+
+        .sr-description-box p {
+            margin: 7px 0 0;
+            color: #625e55;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        /* ================= IMAGES ================= */
+
+        .sr-reference-section {
+            margin: 0 32px 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee8dc;
+        }
+
+        .sr-reference-section h3 {
+            margin: 0 0 15px;
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .sr-image-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .sr-reference-image {
+            width: 145px;
+            height: 120px;
+            padding: 5px;
+            object-fit: cover;
+            border: 1px solid #e1d8c8;
+            border-radius: 11px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,.06);
+        }
+
+        /* ================= SUBSECTIONS ================= */
+
+        .sr-status-panel,
+        .sr-own-offer-section,
+        .sr-competition-section {
+            margin: 0 32px 30px;
+            padding: 25px;
+            border: 1px solid #e7e0d4;
+            border-radius: 14px;
+            background: #fcfbf8;
+        }
+
+        .sr-subsection-heading {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .sr-section-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: #171715;
+            color: #d4af37;
+            font-family: Georgia, serif;
+            font-weight: 700;
+        }
+
+        .sr-subsection-heading h3 {
+            margin: 0;
+            font-family: Georgia, serif;
+            font-size: 19px;
+            font-weight: 500;
+        }
+
+        .sr-status-panel > p,
+        .sr-competitor-info p {
+            margin: 9px 0;
+            color: #5f5a50;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* genuine positive status */
+        .sr-result-message {
+            margin: 15px 0;
+            padding: 13px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .sr-result-success {
+            border: 1px solid #b8d9bf;
+            background: #edf8ef;
+            color: #276837;
+        }
+
+        .sr-result-neutral {
+            border: 1px solid #ded8cc;
+            background: #f5f2ec;
+            color: #686258;
+        }
+
+        /* ================= OWN OFFER ================= */
+
+        .sr-offer-summary {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 12px;
+        }
+
+        .sr-offer-stat {
+            min-height: 92px;
+            padding: 17px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid #e8e1d5;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .sr-offer-stat strong {
+            font-size: 13px;
+        }
+
+        .sr-offer-price {
+            color: #80620c;
+            font-family: Georgia, serif;
+            font-size: 21px !important;
+        }
+
+        .sr-competitor-info {
+            margin: 14px 0 18px;
+            padding: 13px 16px;
+            border-radius: 9px;
+            background: #f4f0e6;
+        }
+
+        .sr-primary-button {
+            min-height: 43px;
+            padding: 10px 17px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            border-radius: 8px;
+            background: #111;
+            color: #d4af37;
+            font-size: 10px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .sr-primary-button:hover {
+            transform: translateY(-2px);
+            background: #d4af37;
+            color: #111;
+        }
+
+        .sr-no-offer {
+            padding: 20px;
+            border: 1px dashed #d8cfbe;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .sr-no-offer h4 {
+            margin: 0 0 7px;
+            font-family: Georgia, serif;
+            font-size: 17px;
+        }
+
+        .sr-no-offer p {
+            margin: 0 0 16px;
+            color: #777166;
+            font-size: 11px;
+        }
+
+        /* ================= COMPETITION ================= */
+
+        .sr-lowest-offer {
+            margin-bottom: 15px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border: 1px solid #dec979;
+            border-radius: 10px;
+            background: #f8f1dc;
+        }
+
+        .sr-lowest-offer span {
+            color: #776528;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sr-lowest-offer strong {
+            color: #73570b;
+            font-family: Georgia, serif;
+            font-size: 22px;
+        }
+
+        .sr-competition-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .sr-competition-card {
+            padding: 17px 18px;
+            border: 1px solid #e9e3d8;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .sr-competition-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .sr-competition-card-top > div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sr-competition-card-top strong {
+            font-size: 12px;
+        }
+
+        .sr-competition-price {
+            text-align: right;
+        }
+
+        .sr-competition-price strong {
+            color: #80620c;
+            font-family: Georgia, serif;
+            font-size: 18px;
+        }
+
+        .sr-you-label {
+            color: #967616;
+            font-size: 9px;
+        }
+
+        .sr-competition-card-bottom {
+            margin-top: 13px;
+            padding-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            border-top: 1px solid #f0ece4;
+        }
+
+        .sr-competition-card-bottom p {
+            margin: 0;
+            color: #706a60;
+            font-size: 10px;
+        }
+
+        .sr-offer-status {
+            padding: 6px 9px;
+            border-radius: 20px;
+            background: #efede8;
+            color: #716b60;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .sr-own-status {
+            background: #f6edd0;
+            color: #7c620e;
+        }
+
+        .sr-selected-status {
+            background: #e9f6ec;
+            color: #28703a;
+        }
+
+        /* ================= EMPTY STATES ================= */
+
+        .sr-empty-competition,
+        .sr-empty-state {
+            text-align: center;
+        }
+
+        .sr-empty-competition {
+            padding: 27px;
+            border: 1px dashed #ddd5c7;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .sr-empty-icon {
+            width: 47px;
+            height: 47px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #171715;
+            color: #d4af37;
+            font-family: Georgia, serif;
+            font-size: 19px;
+        }
+
+        .sr-empty-competition p {
+            margin: 0 0 4px;
+            font-family: Georgia, serif;
+            font-size: 15px;
+        }
+
+        .sr-empty-competition > span:last-child {
+            color: #8c8578;
+            font-size: 10px;
+        }
+
+        .sr-empty-state {
+            padding: 70px 30px;
+            border: 1px solid #e4ddcf;
+            border-radius: 16px;
+            background: #fff;
+        }
+
+        .sr-empty-state h3 {
+            margin: 10px 0 7px;
+            font-family: Georgia, serif;
+            font-size: 23px;
+            font-weight: 500;
+        }
+
+        .sr-empty-state p {
+            margin: 0;
+            color: #7d766a;
+            font-size: 12px;
+        }
+
+        /* ================= BACK ================= */
+
+        .sr-back-wrapper {
+            margin-top: 35px;
+        }
+
+        .sr-back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #39352e;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .sr-back-button span {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #111;
+            color: #d4af37;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .sr-footer {
+            padding: 27px clamp(24px,6vw,95px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            border-top: 1px solid #e7e0d2;
+            background: #fff;
+        }
+
+        .sr-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sr-footer-brand .sr-logo-mark {
+            width: 33px;
+            height: 33px;
+            border-radius: 9px;
+            font-size: 17px;
+        }
+
+        .sr-footer-brand strong {
+            font-size: 12px;
+        }
+
+        .sr-footer p,
+        .sr-footer > span {
+            margin: 0;
+            color: #817b70;
+            font-size: 9px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+            .sr-page-header {
+                grid-template-columns: 1fr;
+            }
+
+            .sr-header-art {
+                width: min(480px,100%);
+                margin: auto;
+            }
+
+            .sr-details-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sr-navbar {
+                padding: 12px 5%;
+            }
+
+            .sr-account-label {
+                display: none;
+            }
+
+            .sr-page-header {
+                padding: 48px 6%;
+            }
+
+            .sr-header-content h1 {
+                font-size: 43px;
+            }
+
+            .sr-main {
+                width: 92%;
+                padding: 50px 0 60px;
+            }
+
+            .sr-card-heading,
+            .sr-competition-card-top,
+            .sr-competition-card-bottom {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .sr-card-heading {
+                padding: 24px;
+            }
+
+            .sr-details-grid {
+                padding: 24px;
+                grid-template-columns: 1fr;
+            }
+
+            .sr-description-box,
+            .sr-reference-section,
+            .sr-status-panel,
+            .sr-own-offer-section,
+            .sr-competition-section {
+                margin-left: 24px;
+                margin-right: 24px;
+            }
+
+            .sr-offer-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .sr-competition-price {
+                text-align: left;
+            }
+
+            .sr-footer {
+                padding: 25px 6%;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .sr-brand-text small {
+                display: none;
+            }
+
+            .sr-header-art {
+                min-height: 260px;
+            }
+
+            .sr-art-circle {
+                width: 250px;
+                height: 250px;
+            }
+
+            .sr-description-box,
+            .sr-reference-section,
+            .sr-status-panel,
+            .sr-own-offer-section,
+            .sr-competition-section {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+
+            .sr-primary-button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body class="seller-requirements-page">
 
-    <div class="top-bar">
-        <h1>Buyer Requirements</h1>
-        <p>Matching requirements for {{ seller.name }}</p>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="sr-navbar">
+        <a href="/" class="sr-brand">
+            <span class="sr-logo-mark">R</span>
 
-    <div class="container">
+            <span class="sr-brand-text">
+                <strong>Reverse Shopping</strong>
+                <small>Seller Workspace</small>
+            </span>
+        </a>
+
+        <div class="sr-nav-actions">
+            <span class="sr-account-label">Seller Account</span>
+            <a href="/logout/" class="sr-logout">Logout</a>
+        </div>
+    </nav>
+
+
+    <!-- PAGE HEADER -->
+    <header class="sr-page-header">
+
+        <div class="sr-header-content">
+            <span class="sr-eyebrow">SELLER WORKSPACE</span>
+
+            <h1>Buyer Requirements</h1>
+
+            <p>
+                Explore matching requests, compare competing offers,
+                and manage your offers in one refined marketplace workspace.
+            </p>
+
+            <div class="sr-seller-badge">
+                <span class="sr-status-dot"></span>
+                Requirements for {{ seller.name }}
+            </div>
+        </div>
+
+
+        <div class="sr-header-art">
+            <div class="sr-art-circle"></div>
+
+            <div class="sr-art-card">
+                <span class="sr-art-symbol">⇄</span>
+
+                <span class="sr-art-small">REVERSE SHOPPING</span>
+
+                <h3>
+                    Compete fairly.<br>
+                    Offer confidently.
+                </h3>
+
+                <div class="sr-art-line"></div>
+
+                <p>Find requests. Submit offers. Compare prices.</p>
+            </div>
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="sr-main">
+
+        <div class="sr-section-heading">
+            <span class="sr-section-eyebrow">AVAILABLE REQUESTS</span>
+            <h2>Matching buyer requirements</h2>
+            <p>Review each request and manage your offer.</p>
+        </div>
+
 
         {% if requirement_data %}
 
+        <section class="sr-requirements-list">
+
             {% for item in requirement_data %}
 
-                <div class="card">
+            <article class="sr-requirement-card">
 
-                    <h2>{{ item.requirement.product_type }}</h2>
+                <!-- CARD HEADING -->
+                <div class="sr-card-heading">
+                    <div>
+                        <span class="sr-card-eyebrow">PRODUCT REQUIREMENT</span>
+                        <h2>{{ item.requirement.product_type }}</h2>
+                    </div>
+
+                    <span class="sr-request-label">Buyer Request</span>
+                </div>
+
+
+                <!-- DETAILS -->
+                <div class="sr-details-grid">
+
+                    <div class="sr-detail-item">
+                        <span class="sr-detail-label">Buyer</span>
+                        <strong>{{ item.requirement.buyer.name }}</strong>
+                    </div>
+
+                    <div class="sr-detail-item">
+                        <span class="sr-detail-label">Category</span>
+                        <strong>{{ item.requirement.category.name }}</strong>
+                    </div>
+
+                    <div class="sr-detail-item sr-budget-detail">
+                        <span class="sr-detail-label">Budget Range</span>
+                        <strong>
+                            ₹{{ item.requirement.budget_min }}
+                            – ₹{{ item.requirement.budget_max }}
+                        </strong>
+                    </div>
+
+                    <div class="sr-detail-item">
+                        <span class="sr-detail-label">Preferred Brand</span>
+                        <strong>
+                            {{ item.requirement.preferred_brand|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+                    <div class="sr-detail-item">
+                        <span class="sr-detail-label">Condition</span>
+                        <strong>
+                            {{ item.requirement.condition_type|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+                    <div class="sr-detail-item">
+                        <span class="sr-detail-label">Required By</span>
+                        <strong>
+                            {{ item.requirement.required_by|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+                <div class="sr-description-box">
+                    <span class="sr-detail-label">Additional Requirements</span>
+
+                    <p>
+                        {{ item.requirement.additional_requirements|default:"No additional requirements specified." }}
+                    </p>
+                </div>
+
+
+                <!-- REFERENCE IMAGES -->
+                {% if item.requirement.requirementimages_set.all %}
+
+                <div class="sr-reference-section">
+                    <h3>Reference Images</h3>
+
+                    <div class="sr-image-list">
+
+                        {% for image in item.requirement.requirementimages_set.all %}
+
+                        <img
+                            src="/media/{{ image.image_path }}"
+                            alt="Buyer Reference Image"
+                            class="sr-reference-image"
+                        >
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+                {% endif %}
+
+
+                <!-- BUYER SELECTION -->
+                {% if item.selected_order %}
+
+                <section class="sr-status-panel">
+
+                    <div class="sr-subsection-heading">
+                        <span class="sr-section-icon">✓</span>
+                        <h3>Buyer Selection Status</h3>
+                    </div>
 
                     <p>
                         <strong>Buyer:</strong>
                         {{ item.requirement.buyer.name }}
                     </p>
 
-                    <p>
-                        <strong>Category:</strong>
-                        {{ item.requirement.category.name }}
-                    </p>
+
+                    {% if item.selected_offer.product.seller.id == seller.id %}
+
+                    <div class="sr-result-message sr-result-success">
+                        <strong>Your offer was selected.</strong>
+                    </div>
 
                     <p>
-                        <strong>Budget:</strong>
-                        ₹{{ item.requirement.budget_min }}
-                        -
-                        ₹{{ item.requirement.budget_max }}
+                        <strong>Order Status:</strong>
+                        {{ item.selected_order.order_status }}
                     </p>
+
+                    {% else %}
+
+                    <div class="sr-result-message sr-result-neutral">
+                        <strong>Your offer was not selected.</strong>
+                    </div>
 
                     <p>
-                        <strong>Preferred Brand:</strong>
-                        {{ item.requirement.preferred_brand|default:"Not specified" }}
+                        Buyer selected another seller's offer.
                     </p>
-
-                    <p>
-                        <strong>Condition:</strong>
-                        {{ item.requirement.condition_type|default:"Not specified" }}
-                    </p>
-
-                    <p>
-                        <strong>Additional Requirements:</strong>
-                        {{ item.requirement.additional_requirements|default:"None" }}
-                    </p>
-
-                    {% if item.requirement.requirementimages_set.all %}
-
-                        {% for image in item.requirement.requirementimages_set.all %}
-
-                            <p>
-                                <strong>Reference Image:</strong>
-                            </p>
-
-                            <img
-                                src="/media/{{ image.image_path }}"
-                                alt="Buyer Reference Image"
-                                style="max-width: 300px; border-radius: 10px;"
-                            >
-
-                        {% endfor %}
-
-                    {% endif %}
-
-                    <p>
-                        <strong>Required By:</strong>
-                        {{ item.requirement.required_by|default:"Not specified" }}
-                    </p>
-
-
-                    <!-- BUYER SELECTION STATUS -->
-
-                    {% if item.selected_order %}
-
-                        <hr>
-
-                        <h3>Buyer Selection Status</h3>
-
-                        <p>
-                            <strong>Buyer:</strong>
-                            {{ item.requirement.buyer.name }}
-                        </p>
-
-                        {% if item.selected_offer.product.seller.id == seller.id %}
-
-                            <p>
-                                <strong>✅ Your offer was selected.</strong>
-                            </p>
-
-                            <p>
-                                <strong>Order Status:</strong>
-                                {{ item.selected_order.order_status }}
-                            </p>
-
-                        {% else %}
-
-                            <p>
-                                <strong>❌ Your offer was not selected.</strong>
-                            </p>
-
-                            <p>
-                                Buyer selected another seller's offer.
-                            </p>
-
-                        {% endif %}
-
-                        <p>
-                            <strong>Selected Seller:</strong>
-                            {{ item.selected_offer.product.seller.name }}
-                        </p>
-
-                        <p>
-                            <strong>Selected Offer Price:</strong>
-                            ₹{{ item.selected_offer.offer_price }}
-                        </p>
 
                     {% endif %}
 
 
-                    <!-- YOUR OFFER -->
+                    <p>
+                        <strong>Selected Seller:</strong>
+                        {{ item.selected_offer.product.seller.name }}
+                    </p>
 
-                    <hr>
+                    <p>
+                        <strong>Selected Offer Price:</strong>
+                        ₹{{ item.selected_offer.offer_price }}
+                    </p>
+
+                </section>
+
+                {% endif %}
+
+
+                <!-- YOUR OFFER -->
+                <section class="sr-own-offer-section">
+
+                    <div class="sr-subsection-heading">
+                        <span class="sr-section-icon">₹</span>
+                        <h3>Your Offer</h3>
+                    </div>
+
 
                     {% if item.own_offer %}
 
-                        <h3>Your Offer</h3>
+                    <div class="sr-offer-summary">
 
-                        <p>
-                            <strong>Offer Price:</strong>
-                            ₹{{ item.own_offer.offer_price }}
-                        </p>
+                        <div class="sr-offer-stat">
+                            <span class="sr-detail-label">Offer Price</span>
 
-                        <p>
-                            <strong>Delivery:</strong>
-                            {{ item.own_offer.delivery_days|default:"Not specified" }}
-                            days
-                        </p>
+                            <strong class="sr-offer-price">
+                                ₹{{ item.own_offer.offer_price }}
+                            </strong>
+                        </div>
 
-                        <p>
-                            <strong>Position:</strong>
-                            {{ item.own_position }}{% if item.own_position == 1 %}st{% elif item.own_position == 2 %}nd{% elif item.own_position == 3 %}rd{% else %}th{% endif %}
-                        </p>
+
+                        <div class="sr-offer-stat">
+                            <span class="sr-detail-label">Delivery</span>
+
+                            <strong>
+                                {{ item.own_offer.delivery_days|default:"Not specified" }}
+                                days
+                            </strong>
+                        </div>
+
+
+                        <div class="sr-offer-stat">
+                            <span class="sr-detail-label">Position</span>
+
+                            <strong>
+                                {{ item.own_position }}{% if item.own_position == 1 %}st{% elif item.own_position == 2 %}nd{% elif item.own_position == 3 %}rd{% else %}th{% endif %}
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="sr-competitor-info">
 
                         {% if item.lowest_competitor %}
 
-                            <p>
-                                <strong>Lowest Competitor:</strong>
-                                ₹{{ item.lowest_competitor.offer_price }}
-                            </p>
+                        <p>
+                            <strong>Lowest Competitor:</strong>
+                            ₹{{ item.lowest_competitor.offer_price }}
+                        </p>
 
-                            <p>
-                                <strong>Difference:</strong>
-                                {{ item.price_difference_label }}
-                            </p>
-
-                        {% else %}
-
-                            <p>
-                                <strong>Lowest Competitor:</strong>
-                                No competing offer yet
-                            </p>
-
-                        {% endif %}
-
-
-                        {% if item.selected_order %}
-
-                            {% if item.selected_offer.product.seller.id == seller.id %}
-
-                                <p>
-                                    <strong>✅ Selected Offer</strong>
-                                </p>
-
-                            {% else %}
-
-                                <p>
-                                    <strong>❌ Offer Not Selected</strong>
-                                </p>
-
-                            {% endif %}
+                        <p>
+                            <strong>Difference:</strong>
+                            {{ item.price_difference_label }}
+                        </p>
 
                         {% else %}
 
-                            <a href="/update-offer/{{ item.own_offer.id }}/">
-                                <button>Update Offer</button>
-                            </a>
+                        <p>
+                            <strong>Lowest Competitor:</strong>
+                            No competing offer yet
+                        </p>
 
                         {% endif %}
+
+                    </div>
+
+
+                    {% if item.selected_order %}
+
+                        {% if item.selected_offer.product.seller.id == seller.id %}
+
+                        <div class="sr-result-message sr-result-success">
+                            Selected Offer
+                        </div>
+
+                        {% else %}
+
+                        <div class="sr-result-message sr-result-neutral">
+                            Offer Not Selected
+                        </div>
+
+                        {% endif %}
+
+                    {% else %}
+
+                    <a
+                        href="/update-offer/{{ item.own_offer.id }}/"
+                        class="sr-primary-button"
+                    >
+                        Update Offer <span>→</span>
+                    </a>
+
+                    {% endif %}
 
 
                     {% else %}
 
-                        <h3>You have not submitted an offer</h3>
+                    <div class="sr-no-offer">
+
+                        <h4>You have not submitted an offer</h4>
 
                         {% if item.selected_order %}
 
-                            <p>
-                                Buyer has already selected another seller's offer.
-                            </p>
+                        <p>
+                            Buyer has already selected another seller's offer.
+                        </p>
 
                         {% else %}
 
-                            <a href="/submit-offer/{{ item.requirement.id }}/">
-                                <button>Submit Offer</button>
-                            </a>
+                        <p>
+                            Submit an offer to participate in this requirement.
+                        </p>
+
+                        <a
+                            href="/submit-offer/{{ item.requirement.id }}/"
+                            class="sr-primary-button"
+                        >
+                            Submit Offer <span>→</span>
+                        </a>
 
                         {% endif %}
 
+                    </div>
+
                     {% endif %}
 
+                </section>
 
-                    <!-- SELLER COMPETITION -->
 
-                    <hr>
+                <!-- COMPETITION -->
+                <section class="sr-competition-section">
 
-                    <h3>Seller Competition & Comparison</h3>
+                    <div class="sr-subsection-heading">
+                        <span class="sr-section-icon">⇄</span>
+                        <h3>Seller Competition &amp; Comparison</h3>
+                    </div>
+
 
                     {% if item.all_offers %}
 
-                        <p>
-                            <strong>Lowest Offer:</strong>
-                            ₹{{ item.lowest_offer.offer_price }}
-                        </p>
+                    <div class="sr-lowest-offer">
+                        <span>Current Lowest Offer</span>
+                        <strong>₹{{ item.lowest_offer.offer_price }}</strong>
+                    </div>
+
+
+                    <div class="sr-competition-list">
 
                         {% for offer in item.all_offers %}
 
-                            <div class="card">
+                        <div class="sr-competition-card">
 
-                                <p>
-                                    <strong>Seller:</strong>
-                                    {{ offer.product.seller.name }}
+                            <div class="sr-competition-card-top">
 
-                                    {% if offer.product.seller.id == seller.id %}
-                                        <strong>(You)</strong>
-                                    {% endif %}
-                                </p>
+                                <div>
+                                    <span class="sr-detail-label">Seller</span>
 
-                                <p>
-                                    <strong>Offer Price:</strong>
-                                    ₹{{ offer.offer_price }}
-                                </p>
+                                    <strong>
+                                        {{ offer.product.seller.name }}
+
+                                        {% if offer.product.seller.id == seller.id %}
+                                        <span class="sr-you-label">(You)</span>
+                                        {% endif %}
+                                    </strong>
+                                </div>
+
+
+                                <div class="sr-competition-price">
+                                    <span class="sr-detail-label">Offer Price</span>
+                                    <strong>₹{{ offer.offer_price }}</strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="sr-competition-card-bottom">
 
                                 <p>
                                     <strong>Delivery:</strong>
@@ -262,62 +1347,111 @@
                                     days
                                 </p>
 
+
                                 {% if item.selected_offer and item.selected_offer.id == offer.id %}
 
-                                    <p>
-                                        <strong>✅ Selected by Buyer</strong>
-                                    </p>
+                                <span class="sr-offer-status sr-selected-status">
+                                    Selected by Buyer
+                                </span>
 
                                 {% elif item.selected_order %}
 
-                                    <p>
-                                        Offer not selected.
-                                    </p>
+                                <span class="sr-offer-status">
+                                    Offer not selected
+                                </span>
 
                                 {% elif offer.product.seller.id == seller.id %}
 
-                                    <p>
-                                        <strong>Your Offer</strong>
-                                    </p>
+                                <span class="sr-offer-status sr-own-status">
+                                    Your Offer
+                                </span>
 
                                 {% else %}
 
-                                    <p>
-                                        <strong>Competitor Offer</strong>
-                                    </p>
+                                <span class="sr-offer-status">
+                                    Competitor Offer
+                                </span>
 
                                 {% endif %}
 
                             </div>
 
+                        </div>
+
                         {% endfor %}
+
+                    </div>
+
 
                     {% else %}
 
+                    <div class="sr-empty-competition">
+
+                        <span class="sr-empty-icon">⇄</span>
+
                         <p>No seller offers yet.</p>
+
+                        <span>
+                            Be the first seller to submit an offer.
+                        </span>
+
+                    </div>
 
                     {% endif %}
 
-                </div>
+                </section>
+
+            </article>
 
             {% endfor %}
 
+        </section>
+
+
         {% else %}
 
-            <div class="card">
-                <p>No matching buyer requirements available.</p>
-            </div>
+        <div class="sr-empty-state">
+
+            <span class="sr-empty-icon">▤</span>
+
+            <h3>No matching requirements</h3>
+
+            <p>
+                There are no matching buyer requirements available right now.
+            </p>
+
+        </div>
 
         {% endif %}
 
-        <br>
 
-        <a href="/seller/">
-            <button>Back to Seller Dashboard</button>
-        </a>
+        <div class="sr-back-wrapper">
+            <a href="/seller/" class="sr-back-button">
+                <span>←</span>
+                Back to Seller Dashboard
+            </a>
+        </div>
 
-    </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="sr-footer">
+
+        <div class="sr-footer-brand">
+            <span class="sr-logo-mark">R</span>
+            <strong>Reverse Shopping</strong>
+        </div>
+
+        <p>
+            Shopping begins with what you need.
+        </p>
+
+        <span>
+            © 2026 Reverse Shopping
+        </span>
+
+    </footer>
 
 </body>
-
 </html>
