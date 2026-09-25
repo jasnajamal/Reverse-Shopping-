@@ -724,6 +724,29 @@
             color: #111;
         }
 
+        .mr-close-button {
+            min-height: 44px;
+            padding: 11px 18px;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            background: transparent;
+            color: #111111;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .mr-close-button:hover {
+            background: #111111;
+            border-color: #111111;
+            color: #d4af37;
+            transform: translateY(-2px);
+        }
+
         /* ================= EMPTY ================= */
 
         .mr-empty {
@@ -1275,6 +1298,18 @@
                             </strong>
 
                         </div>
+                        <!-- STATUS -->
+                        <div class="mr-detail">
+
+                            <span class="mr-detail-label">
+                                Status
+                            </span>
+
+                            <strong>
+                                {{ requirement.status }}
+                            </strong>
+
+                        </div>
 
                     </div>
 
@@ -1367,6 +1402,20 @@
                                 →
                             </span>
                         </a>
+                        {% if requirement.status != 'Closed' and requirement.status != 'Selected' %}
+
+                        <form
+                            method="POST"
+                            action="/close-requirement/{{ requirement.id }}/"
+                        >
+                            {% csrf_token %}
+
+                            <button type="submit" class="mr-close-button">
+                                Close Requirement
+                            </button>
+                        </form>
+
+                        {% endif %}
 
                     </div>
 

@@ -86,6 +86,7 @@ class Requirements(models.Model):
     condition_type = models.CharField(max_length=6, blank=True, null=True)
     additional_requirements = models.TextField(blank=True, null=True)
     required_by = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=20, default='Open')
     created_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:

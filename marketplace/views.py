@@ -686,3 +686,27 @@ def notifications(request):
         'marketplace/notifications.html',
         {'notifications': user_notifications}
     )
+
+def close_requirement(request, requirement_id):
+    buyer_id = request.session.get('user_id')
+
+    if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
+    requirement = Requirements.objects.get(
+        id=requirement_id,
+        buyer_id=buyer_id
+    )
+
+    if request.method == 'POST':
+        if requirement.status not in ['Selected', 'Closed']:
+            requirement.status = 'Closed'
+            requirement.save(update_fields=['status'])
+            messages.success(request, 'Requirement closed successfully.')
+
+        return redirect('/my-requirements/')
+
+    return redirect('/my-requirements/')
