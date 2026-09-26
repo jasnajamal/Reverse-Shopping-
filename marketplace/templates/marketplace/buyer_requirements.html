@@ -1244,30 +1244,36 @@
                     </div>
 
 
-                    {% if item.selected_order %}
+                    {% if item.requirement.status == 'Closed' %}
+
+                        <div class="sr-result-message sr-result-neutral">
+                            Requirement Closed
+                        </div>
+
+                    {% elif item.selected_order %}
 
                         {% if item.selected_offer.product.seller.id == seller.id %}
 
-                        <div class="sr-result-message sr-result-success">
-                            Selected Offer
-                        </div>
+                            <div class="sr-result-message sr-result-success">
+                                Selected Offer
+                            </div>
 
                         {% else %}
 
-                        <div class="sr-result-message sr-result-neutral">
-                            Offer Not Selected
-                        </div>
+                            <div class="sr-result-message sr-result-neutral">
+                                Offer Not Selected
+                            </div>
 
                         {% endif %}
 
                     {% else %}
 
-                    <a
-                        href="/update-offer/{{ item.own_offer.id }}/"
-                        class="sr-primary-button"
-                    >
-                        Update Offer <span>→</span>
-                    </a>
+                        <a
+                            href="/update-offer/{{ item.own_offer.id }}/"
+                            class="sr-primary-button"
+                        >
+                            Update Offer <span>→</span>
+                        </a>
 
                     {% endif %}
 
@@ -1278,24 +1284,38 @@
 
                         <h4>You have not submitted an offer</h4>
 
-                        {% if item.selected_order %}
+                       {% if item.requirement.status == 'Closed' %}
 
-                        <p>
-                            Buyer has already selected another seller's offer.
-                        </p>
+                            <p>
+                                This requirement has been closed by the buyer.
+                            </p>
+
+                            <div class="sr-result-message sr-result-neutral">
+                                Requirement Closed
+                            </div>
+
+                        {% elif item.selected_order %}
+
+                            <p>
+                                Buyer has already selected an offer for this requirement.
+                            </p>
+
+                            <div class="sr-result-message sr-result-neutral">
+                                Offer Already Selected
+                            </div>
 
                         {% else %}
 
-                        <p>
-                            Submit an offer to participate in this requirement.
-                        </p>
+                            <p>
+                                Submit an offer to participate in this requirement.
+                            </p>
 
-                        <a
-                            href="/submit-offer/{{ item.requirement.id }}/"
-                            class="sr-primary-button"
-                        >
-                            Submit Offer <span>→</span>
-                        </a>
+                            <a
+                                href="/submit-offer/{{ item.requirement.id }}/"
+                                class="sr-primary-button"
+                            >
+                                Submit Offer <span>→</span>
+                            </a>
 
                         {% endif %}
 

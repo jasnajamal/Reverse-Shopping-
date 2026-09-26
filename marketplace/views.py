@@ -362,11 +362,20 @@ def submit_offer(request, requirement_id):
         return redirect('/login/')
 
     seller = Users.objects.get(id=seller_id, role='seller')
-    requirement = Requirements.objects.get(id=requirement_id)
-
-    # Allow seller to submit offers only for their category
-    if seller.category_id != requirement.category_id:
+    try:
+        requirement = Requirements.objects.get(
+            id=requirement_id,
+            category_id=seller.category_id,
+            status__in=['Open', 'Offer Received']
+        )
+    except Requirements.DoesNotExist:
+        messages.error(
+            request,
+            'This requirement is closed, selected, or unavailable.'
+        )
         return redirect('/buyer-requirements/')
+
+    
 
     # Prevent duplicate offers from the same seller
     existing_offer = Offers.objects.filter(
@@ -425,6 +434,11 @@ def submit_offer(request, requirement_id):
             message=message or None
         )
 
+        # Update requirement status after receiving an offer
+        if requirement.status == 'Open':
+            requirement.status = 'Offer Received'
+            requirement.save(update_fields=['status'])
+
         Notifications.objects.create(
             user_id=requirement.buyer_id,
             message=(
@@ -461,7 +475,15 @@ def update_offer(request, offer_id):
         product__seller=seller
     )
 
-    product = offer.product
+    # Prevent updating offers after requirement is closed or selected
+    if offer.requirement.status in ['Closed', 'Selected']:
+        messages.error(
+            request,
+            'This offer can no longer be updated because the requirement is closed or selected.'
+        )
+        return redirect('/buyer-requirements/')
+
+    product = offer.products
 
     if request.method == 'POST':
         product.product_name = request.POST.get('product_name')
@@ -585,6 +607,10 @@ def select_offer(request, offer_id):
         order_status='pending',
         order_date=timezone.now()
     )
+
+    # Update requirement status
+    offer.requirement.status = 'Selected'
+    offer.requirement.save(update_fields=['status'])
 
     Notifications.objects.create(
         user_id=offer.product.seller_id,
