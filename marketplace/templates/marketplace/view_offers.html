@@ -1355,6 +1355,111 @@
                 height: 140px;
             }
         }
+
+        /* ================= REVIEW ================= */
+
+        .bo-review-box {
+            margin-top: 16px;
+            padding: 20px;
+
+            border: 1px solid #e2dacb;
+            border-radius: 11px;
+
+            background: #faf7ef;
+        }
+
+        .bo-review-box > strong {
+            display: block;
+            margin-bottom: 15px;
+
+            color: #332f28;
+
+            font-family: Georgia, serif;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .bo-review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bo-review-form label {
+            margin-top: 4px;
+
+            color: #81796c;
+
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .bo-review-form select,
+        .bo-review-form textarea {
+            width: 100%;
+            padding: 12px 13px;
+
+            border: 1px solid #ddd5c8;
+            border-radius: 8px;
+
+            background: #fff;
+            color: #302d27;
+
+            font-family: inherit;
+            font-size: 11px;
+
+            outline: none;
+        }
+
+        .bo-review-form select:focus,
+        .bo-review-form textarea:focus {
+            border-color: #d4af37;
+        }
+
+        .bo-review-form textarea {
+            resize: vertical;
+        }
+
+        .bo-review-form button {
+            min-height: 44px;
+            margin-top: 5px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #111;
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .bo-review-form button:hover {
+            background: #d4af37;
+            color: #111;
+        }
+
+        .bo-review-rating {
+            margin: 0 0 8px;
+
+            color: #80640f;
+
+            font-weight: 800;
+        }
+
+        .bo-review-box > p:last-child {
+            margin-bottom: 0;
+
+            color: #625c52;
+
+            font-size: 11px;
+            line-height: 1.7;
+        }
     </style>
 </head>
 
@@ -1496,7 +1601,7 @@
 
 
                 <span class="bo-request-badge">
-                    Active Requirement
+                    {{ requirement.status }}
                 </span>
 
             </div>
@@ -1894,6 +1999,73 @@
 
                     </div>
 
+                    {% if existing_review %}
+
+                    <div class="bo-review-box">
+                        <strong>Your Review</strong>
+
+                        <p class="bo-review-rating">
+                            Rating: {{ existing_review.rating }} / 5
+                        </p>
+
+                        {% if existing_review.review_text %}
+                        <p>
+                            {{ existing_review.review_text }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    {% else %}
+
+                    <div class="bo-review-box">
+
+                        <strong>Rate & Review Seller</strong>
+
+                        <form
+                            method="POST"
+                            action="/add-review/{{ selected_order.id }}/"
+                            class="bo-review-form"
+                        >
+                            {% csrf_token %}
+
+                            <label for="rating-{{ offer.id }}">
+                                Rating
+                            </label>
+
+                            <select
+                                id="rating-{{ offer.id }}"
+                                name="rating"
+                                required
+                            >
+                                <option value="">Select rating</option>
+                                <option value="5">★★★★★ — 5</option>
+                                <option value="4">★★★★☆ — 4</option>
+                                <option value="3">★★★☆☆ — 3</option>
+                                <option value="2">★★☆☆☆ — 2</option>
+                                <option value="1">★☆☆☆☆ — 1</option>
+                            </select>
+
+                            <label for="review-{{ offer.id }}">
+                                Review
+                            </label>
+
+                            <textarea
+                                id="review-{{ offer.id }}"
+                                name="review_text"
+                                rows="4"
+                                placeholder="Write your experience with this seller..."
+                            ></textarea>
+
+                            <button type="submit">
+                                Submit Review
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {% endif %}
+
 
                     {% elif selected_order %}
 
@@ -1905,18 +2077,26 @@
 
                     {% else %}
 
+                        {% if requirement.status == 'Closed' %}
 
-                    <a
-                        href="/select-offer/{{ offer.id }}/"
-                        class="bo-select-button"
-                    >
-                        Select This Offer
+                            <div class="bo-not-selected">
+                                Requirement Closed — Offer selection is no longer available.
+                            </div>
 
-                        <span>
-                            →
-                        </span>
-                    </a>
+                        {% else %}
 
+                            <a
+                                href="/select-offer/{{ offer.id }}/"
+                                class="bo-select-button"
+                            >
+                                Select This Offer
+
+                                <span>
+                                    →
+                                </span>
+                            </a>
+
+                        {% endif %}
 
                     {% endif %}
 

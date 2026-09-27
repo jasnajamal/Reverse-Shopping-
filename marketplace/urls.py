@@ -20,5 +20,6 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('logout/', views.logout_view, name='logout'),
     path('selected-orders/', views.selected_orders, name='selected_orders'),
+    path('add-review/<int:order_id>/',views.add_review,name='add_review'),
 
 ]

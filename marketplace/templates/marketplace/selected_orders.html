@@ -909,6 +909,62 @@
                 text-align: left;
             }
         }
+
+        /* =========================
+        BUYER REVIEW
+        ========================= */
+
+        .so-review-box {
+            margin-top: 18px;
+            padding: 18px 20px;
+
+            border: 1px solid #e2dacb;
+            border-radius: 10px;
+
+            background: #faf7ef;
+        }
+
+        .so-review-label {
+            display: block;
+            margin-bottom: 9px;
+
+            color: #967616;
+
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+        }
+
+        .so-review-rating {
+            margin-bottom: 8px;
+
+            color: #72570c;
+
+            font-family: Georgia, serif;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .so-review-box p {
+            margin: 0 0 9px;
+
+            color: #5f594f;
+
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .so-review-box small {
+            color: #928b7e;
+
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .so-no-review p {
+            margin-bottom: 0;
+            color: #928b7e;
+        }
     </style>
 </head>
 
@@ -1163,6 +1219,51 @@
                         </div>
 
                     </div>
+
+                    <!-- BUYER REVIEW -->
+                    {% if order.reviews_set.all %}
+
+                        {% for review in order.reviews_set.all %}
+
+                        <div class="so-review-box">
+
+                            <span class="so-review-label">
+                                BUYER REVIEW
+                            </span>
+
+                            <div class="so-review-rating">
+                                ★ {{ review.rating }} / 5
+                            </div>
+
+                            {% if review.review_text %}
+                            <p>
+                                {{ review.review_text }}
+                            </p>
+                            {% endif %}
+
+                            <small>
+                                Reviewed by {{ review.buyer.name }}
+                            </small>
+
+                        </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="so-review-box so-no-review">
+
+                            <span class="so-review-label">
+                                BUYER REVIEW
+                            </span>
+
+                            <p>
+                                No review submitted yet.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
 
                 </div>
 

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages, Notifications
+from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages, Notifications, Reviews
 from django.utils import timezone
 
 
@@ -104,12 +104,23 @@ def buyer_dashboard(request):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    buyer = Users.objects.get(id=buyer_id, role='buyer')
+    buyer = Users.objects.get(
+        id=buyer_id,
+        role='buyer'
+    )
+
+    unread_count = Notifications.objects.filter(
+        user_id=buyer_id,
+        is_read=False
+    ).count()
 
     return render(
         request,
         'marketplace/buyer_dashboard.html',
-        {'buyer': buyer}
+        {
+            'buyer': buyer,
+            'unread_count': unread_count
+        }
     )
 
 def post_requirement(request):
@@ -215,14 +226,25 @@ def seller_dashboard(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    seller = Users.objects.get(
+        id=seller_id,
+        role='seller'
+    )
+
+    unread_count = Notifications.objects.filter(
+        user_id=seller_id,
+        is_read=False
+    ).count()
 
     return render(
         request,
         'marketplace/seller_dashboard.html',
-        {'seller': seller}
+        {
+            'seller': seller,
+            'unread_count': unread_count
+        }
     )
-
+    
 def selected_orders(request):
     seller_id = request.session.get('user_id')
 
@@ -241,6 +263,8 @@ def selected_orders(request):
         'offer',
         'offer__product',
         'offer__requirement'
+    ).prefetch_related(
+        'reviews_set'
     ).order_by('-id')
 
     return render(
@@ -567,13 +591,22 @@ def view_offers(request, requirement_id):
         'offer__product__seller'
     ).first()
 
+    existing_review = None
+
+    if selected_order:
+        existing_review = Reviews.objects.filter(
+            order=selected_order,
+            buyer_id=buyer_id
+        ).first()
+
     return render(
         request,
         'marketplace/view_offers.html',
         {
             'requirement': requirement,
             'offers': offers,
-            'selected_order': selected_order
+            'selected_order': selected_order,
+            'existing_review': existing_review
         }
     )
 
@@ -591,6 +624,14 @@ def select_offer(request, offer_id):
         requirement__buyer_id=buyer_id
     )
 
+    # Prevent offer selection for a closed requirement
+    if offer.requirement.status == 'Closed':
+        messages.error(
+            request,
+            'This requirement is closed. You cannot select an offer.'
+        )
+        return redirect(f'/view-offers/{offer.requirement.id}/')
+
     if Orders.objects.filter(
         buyer_id=buyer_id,
         offer__requirement=offer.requirement
@@ -604,7 +645,7 @@ def select_offer(request, offer_id):
     Orders.objects.create(
         buyer_id=buyer_id,
         offer=offer,
-        order_status='pending',
+        order_status='selected',
         order_date=timezone.now()
     )
 
@@ -736,3 +777,88 @@ def close_requirement(request, requirement_id):
         return redirect('/my-requirements/')
 
     return redirect('/my-requirements/')
+
+def add_review(request, order_id):
+    buyer_id = request.session.get('user_id')
+
+    if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
+    try:
+        order = Orders.objects.select_related(
+            'offer',
+            'offer__product',
+            'offer__product__seller'
+        ).get(
+            id=order_id,
+            buyer_id=buyer_id
+        )
+    except Orders.DoesNotExist:
+        messages.error(request, 'Order not found.')
+        return redirect('/buyer/')
+
+    # Prevent duplicate review for the same order
+    if Reviews.objects.filter(
+        order=order,
+        buyer_id=buyer_id
+    ).exists():
+        messages.info(
+            request,
+            'You have already reviewed this order.'
+        )
+        return redirect(
+            f'/view-offers/{order.offer.requirement_id}/'
+        )
+
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        review_text = request.POST.get('review_text')
+
+        # Rating must be between 1 and 5
+        try:
+            rating = int(rating)
+        except (TypeError, ValueError):
+            rating = 0
+
+        if rating < 1 or rating > 5:
+            messages.error(
+                request,
+                'Please select a rating between 1 and 5.'
+            )
+            return redirect(
+                f'/view-offers/{order.offer.requirement_id}/'
+            )
+
+        Reviews.objects.create(
+            order=order,
+            buyer_id=buyer_id,
+            seller_id=order.offer.product.seller_id,
+            rating=rating,
+            review_text=review_text or None,
+            created_at=timezone.now()
+        )
+
+        Notifications.objects.create(
+            user_id=order.offer.product.seller_id,
+            message=(
+                f'{order.buyer.name} gave you a {rating}/5 rating '
+                f'for {order.offer.product.product_name}.'
+            ),
+            created_at=timezone.now()
+        )
+
+        messages.success(
+            request,
+            'Your rating and review have been submitted.'
+        )
+
+        return redirect(
+            f'/view-offers/{order.offer.requirement_id}/'
+        )
+
+    return redirect(
+        f'/view-offers/{order.offer.requirement_id}/'
+    )

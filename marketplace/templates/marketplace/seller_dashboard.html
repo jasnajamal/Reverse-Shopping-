@@ -1243,6 +1243,28 @@
                 font-size: 29px;
             }
         }
+
+        .sd-notification-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 24px;
+            height: 24px;
+            margin-left: 8px;
+            padding: 0 7px;
+
+            border-radius: 20px;
+
+            background: #d4af37;
+            color: #111111;
+
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+
+            vertical-align: middle;
+        }
     </style>
 </head>
 
@@ -1684,6 +1706,12 @@
 
                     <h3>
                         Notifications
+
+                        {% if unread_count > 0 %}
+                            <span class="sd-notification-count">
+                                {{ unread_count }}
+                            </span>
+                        {% endif %}
                     </h3>
 
                     <p>
