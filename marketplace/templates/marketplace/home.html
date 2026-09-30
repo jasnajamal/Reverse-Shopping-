@@ -1419,6 +1419,47 @@
                 border-top: 1px solid #333128;
             }
         }
+
+        /* ===== UPDATED HERO SHOPPING PREVIEW ===== */
+
+        .product-preference {
+            margin: 7px 0 0;
+
+            color: #817d74;
+
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+        .shopping-icon {
+            width: 41px;
+            height: 41px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #4b432b;
+            border-radius: 10px;
+
+            background: rgba(212, 175, 55, 0.03);
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 20px;
+        }
+
+        .shopping-icon::after {
+            content: "₹";
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+
+        
     </style>
 </head>
 
@@ -1539,32 +1580,31 @@
         </div>
 
 
+        
         <!-- MARKETPLACE PREVIEW -->
         <div class="hero-right">
 
             <div class="glow"></div>
-
 
             <div class="requirement-card">
 
                 <div class="card-top">
 
                     <div>
-
                         <span class="card-label">
                             YOUR REQUIREMENT
                         </span>
 
                         <h3>
-                            NCERT Science Book
+                            Wireless Headphones
                         </h3>
 
+                        <p class="product-preference">
+                            Premium over-ear • Noise cancellation
+                        </p>
                     </div>
 
-
-                    <div class="bag-icon">
-                        ◇
-                    </div>
+                    <div class="shopping-icon"></div>
 
                 </div>
 
@@ -1572,20 +1612,16 @@
                 <div class="budget-row">
 
                     <div>
-
                         <small>
                             Your Budget
                         </small>
 
                         <strong>
-                            ₹300 - ₹500
+                            ₹2,500 - ₹4,000
                         </strong>
-
                     </div>
 
-
                     <div class="offer-count">
-
                         <small>
                             Seller Offers
                         </small>
@@ -1593,7 +1629,6 @@
                         <strong>
                             3 offers
                         </strong>
-
                     </div>
 
                 </div>
@@ -1602,7 +1637,7 @@
                 <div class="offers-title">
 
                     <span>
-                        SELLER OFFERS
+                        COMPETING OFFERS
                     </span>
 
                     <span>
@@ -1612,86 +1647,83 @@
                 </div>
 
 
+                <!-- OFFER 1 -->
                 <div class="offer offer-best">
 
                     <div class="seller-icon">
-                        R
+                        S
                     </div>
-
 
                     <div class="seller-info">
 
                         <strong>
-                            Rahul Books
+                            SoundHub
                         </strong>
 
                         <small>
-                            Delivery: 2 days
+                            ★ 4.8 &nbsp; • &nbsp; Free delivery &nbsp; • &nbsp; 1 day
                         </small>
 
                         <span class="best-offer-tag">
-                            BEST PRICE
+                            LOWEST PRICE
                         </span>
 
                     </div>
 
-
                     <strong class="price">
-                        ₹400
+                        ₹2,899
                     </strong>
 
                 </div>
 
 
+                <!-- OFFER 2 -->
                 <div class="offer">
 
                     <div class="seller-icon">
-                        M
+                        T
                     </div>
-
 
                     <div class="seller-info">
 
                         <strong>
-                            Meera Education
+                            TechZone
                         </strong>
 
                         <small>
-                            Delivery: 2 days
+                            ★ 4.6 &nbsp; • &nbsp; Delivery: 2 days
                         </small>
 
                     </div>
 
-
                     <strong class="price">
-                        ₹420
+                        ₹3,150
                     </strong>
 
                 </div>
 
 
+                <!-- OFFER 3 -->
                 <div class="offer">
 
                     <div class="seller-icon">
-                        A
+                        D
                     </div>
-
 
                     <div class="seller-info">
 
                         <strong>
-                            ABC Books
+                            Digital Store
                         </strong>
 
                         <small>
-                            Delivery: 3 days
+                            ★ 4.7 &nbsp; • &nbsp; Delivery: 2 days
                         </small>
 
                     </div>
 
-
                     <strong class="price">
-                        ₹450
+                        ₹3,399
                     </strong>
 
                 </div>
@@ -1714,12 +1746,12 @@
 
             <div class="floating-note">
 
-                ✓ Better choice
+                ✓ Compare. Choose. Save.
 
                 <br>
 
                 <span>
-                    Compare before you buy
+                    Better offers, your decision
                 </span>
 
             </div>
