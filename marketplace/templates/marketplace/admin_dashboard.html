@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | Reverse Shopping</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f8f5ed;
+            color: #171715;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            width: 240px;
+            height: 100vh;
+
+            padding: 30px 20px;
+
+            background: #111111;
+            color: white;
+        }
+
+        .logo {
+            margin-bottom: 45px;
+
+            color: #d4af37;
+
+            font-family: Georgia, serif;
+            font-size: 22px;
+        }
+
+        .logo small {
+            display: block;
+
+            margin-top: 5px;
+
+            color: #77736a;
+
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: block;
+
+            margin-bottom: 8px;
+            padding: 13px 15px;
+
+            border-radius: 8px;
+
+            color: #aaa69d;
+            text-decoration: none;
+
+            font-size: 12px;
+
+            transition: .2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #24221c;
+            color: #d4af37;
+        }
+
+        /* ===== MAIN ===== */
+
+        .main {
+            margin-left: 240px;
+            padding: 45px;
+        }
+
+        .header {
+            margin-bottom: 35px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-label {
+            color: #a1832c;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .header h1 {
+            margin: 7px 0 0;
+
+            font-family: Georgia, serif;
+            font-size: 34px;
+            font-weight: 500;
+        }
+
+        .admin-badge {
+            padding: 10px 16px;
+
+            border: 1px solid #ded5c4;
+            border-radius: 8px;
+
+            background: white;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* ===== STATS ===== */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card {
+            min-height: 150px;
+            padding: 24px;
+
+            border: 1px solid #e2dbce;
+            border-radius: 13px;
+
+            background: white;
+        }
+
+        .stat-card span {
+            color: #8c8579;
+
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .stat-card h2 {
+            margin: 25px 0 0;
+
+            color: #171715;
+
+            font-family: Georgia, serif;
+            font-size: 35px;
+            font-weight: 500;
+        }
+
+        .stat-card.highlight {
+            border-color: #2d2b25;
+
+            background: #171715;
+        }
+
+        .stat-card.highlight span {
+            color: #a99a68;
+        }
+
+        .stat-card.highlight h2 {
+            color: #d4af37;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sidebar {
+                position: static;
+
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 25px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .logout-link {
+            margin-top: 35px;
+            border: 1px solid #3b382f;
+            color: #d4af37;
+        }
+
+        .logout-link:hover {
+            background: #d4af37;
+            color: #111111;
+        }
+
+        .admin-welcome {
+            margin: 8px 0 0;
+            color: #8c8579;
+            font-size: 11px;
+        }
+
+        .average-rating {
+            margin-top: 8px;
+            color: #a1832c;
+            font-size: 9px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            Reverse Shopping
+            <small>ADMINISTRATION</small>
+        </div>
+
+        <a href="/custom-admin/" class="nav-link active">
+            Dashboard
+        </a>
+
+        <p class="admin-welcome">
+            Logged in as {{ request.session.admin_username }}
+        </p>
+
+        <a href="/custom-admin/buyers/" class="nav-link">
+            Manage Buyers
+        </a>
+
+        <a href="/custom-admin/sellers/" class="nav-link">
+            Manage Sellers
+        </a>
+
+        <a href="/custom-admin/requirements/" class="nav-link">
+            Requirements
+        </a>
+
+        <a href="/custom-admin/offers/" class="nav-link">
+            Offers
+        </a>
+
+        <a href="/custom-admin/orders/" class="nav-link">
+            Orders
+        </a>
+
+        <a href="/custom-admin/reviews/" class="nav-link">
+            Reviews
+        </a>
+
+        <a href="/custom-admin/logout/" class="nav-link logout-link">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+                <span class="header-label">
+                    ADMINISTRATION
+                </span>
+
+                <h1>
+                    Dashboard
+                </h1>
+            </div>
+
+            <div class="admin-badge">
+                Administrator
+            </div>
+
+        </div>
+
+
+        <!-- STATISTICS -->
+
+        <section class="stats">
+
+            <div class="stat-card highlight">
+                <span>TOTAL BUYERS</span>
+                <h2>{{ total_buyers }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <span>TOTAL SELLERS</span>
+                <h2>{{ total_sellers }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <span>REQUIREMENTS</span>
+                <h2>{{ total_requirements }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <span>OFFERS</span>
+                <h2>{{ total_offers }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <span>SELECTED ORDERS</span>
+                <h2>{{ total_orders }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">REVIEWS</div>
+
+                <div class="stat-number">
+                    {{ total_reviews }}
+                </div>
+
+                {% if average_rating %}
+                    <div class="average-rating">
+                        ★ {{ average_rating|floatformat:1 }} / 5 Average Rating
+                    </div>
+                {% else %}
+                    <div class="average-rating">
+                        No ratings yet
+                    </div>
+                {% endif %}
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -21,5 +21,14 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('selected-orders/', views.selected_orders, name='selected_orders'),
     path('add-review/<int:order_id>/',views.add_review,name='add_review'),
+    path('admin-login/', views.admin_login, name='admin_login'),
+    path('custom-admin/',views.custom_admin_dashboard,name='custom_admin_dashboard'),
+    path('custom-admin/buyers/',views.admin_manage_buyers,name='admin_manage_buyers'),
+    path('custom-admin/sellers/',views.admin_manage_sellers,name='admin_manage_sellers'),
+    path('custom-admin/requirements/',views.admin_manage_requirements,name='admin_manage_requirements'),
+    path('custom-admin/offers/',views.admin_manage_offers,name='admin_manage_offers'),
+    path('custom-admin/orders/',views.admin_manage_orders,name='admin_manage_orders'),
+    path('custom-admin/reviews/',views.admin_manage_reviews,name='admin_manage_reviews'),
+    path('custom-admin/logout/',views.custom_admin_logout,name='custom_admin_logout'),
 
 ]

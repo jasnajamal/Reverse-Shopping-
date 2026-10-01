@@ -4,6 +4,9 @@ from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password, check_password
 from .models import Users, Requirements, Categories, Products, Offers, Orders, RequirementImages, ProductImages, Notifications, Reviews
 from django.utils import timezone
+from django.contrib.auth import authenticate
+from django.db.models import Avg
+
 
 
 def home(request):
@@ -862,3 +865,175 @@ def add_review(request, order_id):
     return redirect(
         f'/view-offers/{order.offer.requirement_id}/'
     )
+
+def admin_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
+
+        if user is not None and user.is_superuser:
+            request.session['admin_logged_in'] = True
+            request.session['admin_username'] = user.username
+
+            return redirect('/custom-admin/')
+
+        messages.error(
+            request,
+            'Invalid admin username or password.'
+        )
+
+        return redirect('/#admin-login')
+
+    return redirect('/#admin-login')
+
+
+def custom_admin_dashboard(request):
+    # Only logged-in admin can access
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    context = {
+        'total_buyers': Users.objects.filter(
+            role='buyer'
+        ).count(),
+
+        'total_sellers': Users.objects.filter(
+            role='seller'
+        ).count(),
+
+        'total_requirements': Requirements.objects.count(),
+
+        'total_offers': Offers.objects.count(),
+
+        'total_orders': Orders.objects.count(),
+
+        'total_reviews': Reviews.objects.count(),
+        'average_rating': Reviews.objects.aggregate(
+            Avg('rating')
+        )['rating__avg'],
+    }
+
+    return render(
+        request,
+        'marketplace/admin_dashboard.html',
+        context
+    )
+
+def admin_manage_buyers(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    buyers = Users.objects.filter(
+        role='buyer'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_buyers.html',
+        {
+            'buyers': buyers
+        }
+    )
+
+def admin_manage_sellers(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    sellers = Users.objects.filter(
+        role='seller'
+    ).select_related(
+        'category'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_sellers.html',
+        {
+            'sellers': sellers
+        }
+    )
+
+def admin_manage_requirements(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    requirements = Requirements.objects.select_related(
+        'buyer',
+        'category'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_requirements.html',
+        {
+            'requirements': requirements
+        }
+    )
+
+def admin_manage_offers(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    offers = Offers.objects.select_related(
+        'requirement',
+        'product',
+        'product__seller'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_offers.html',
+        {
+            'offers': offers
+        }
+    )
+
+def admin_manage_orders(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    orders = Orders.objects.select_related(
+        'buyer',
+        'offer',
+        'offer__product',
+        'offer__product__seller',
+        'offer__requirement'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_orders.html',
+        {
+            'orders': orders
+        }
+    )
+
+def admin_manage_reviews(request):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    reviews = Reviews.objects.select_related(
+        'order',
+        'buyer',
+        'seller'
+    ).order_by('-id')
+
+    return render(
+        request,
+        'marketplace/admin_manage_reviews.html',
+        {
+            'reviews': reviews
+        }
+    )
+
+def custom_admin_logout(request):
+    request.session.pop('admin_logged_in', None)
+    request.session.pop('admin_username', None)
+
+    return redirect('/')

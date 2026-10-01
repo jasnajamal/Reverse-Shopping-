@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Orders | Reverse Shopping</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f8f5ed;
+            color: #171715;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            padding: 30px 20px;
+            background: #111111;
+            color: white;
+        }
+
+        .logo {
+            margin-bottom: 45px;
+            color: #d4af37;
+            font-family: Georgia, serif;
+            font-size: 22px;
+        }
+
+        .logo small {
+            display: block;
+            margin-top: 5px;
+            color: #77736a;
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: block;
+            margin-bottom: 8px;
+            padding: 13px 15px;
+            border-radius: 8px;
+            color: #aaa69d;
+            text-decoration: none;
+            font-size: 12px;
+            transition: .2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #24221c;
+            color: #d4af37;
+        }
+
+        /* ===== MAIN ===== */
+
+        .main {
+            margin-left: 240px;
+            padding: 45px;
+        }
+
+        .header {
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-label {
+            color: #a1832c;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .header h1 {
+            margin: 7px 0 0;
+            font-family: Georgia, serif;
+            font-size: 34px;
+            font-weight: 500;
+        }
+
+        .count-badge {
+            padding: 10px 16px;
+            border: 1px solid #ded5c4;
+            border-radius: 8px;
+            background: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* ===== TABLE ===== */
+
+        .table-card {
+            overflow: hidden;
+            border: 1px solid #e2dbce;
+            border-radius: 14px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #171715;
+        }
+
+        th {
+            padding: 16px 18px;
+            color: #d4af37;
+            text-align: left;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 17px 18px;
+            border-bottom: 1px solid #eee8dc;
+            color: #555047;
+            font-size: 11px;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #faf8f2;
+        }
+
+        .buyer-name,
+        .seller-name {
+            color: #171715;
+            font-weight: 700;
+        }
+
+        .price {
+            color: #8b6d18;
+            font-weight: 800;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #f2ecdc;
+            color: #75601e;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: capitalize;
+        }
+
+        .empty {
+            padding: 50px;
+            color: #8c8579;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 1000px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 25px;
+            }
+
+            .table-card {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 1000px;
+            }
+        }
+
+        .logout-link {
+            margin-top: 35px;
+            border: 1px solid #3b382f;
+            color: #d4af37;
+        }
+
+        .logout-link:hover {
+            background: #d4af37;
+            color: #111111;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            Reverse Shopping
+            <small>ADMINISTRATION</small>
+        </div>
+
+        <a href="/custom-admin/" class="nav-link">
+            Dashboard
+        </a>
+
+        <a href="/custom-admin/buyers/" class="nav-link">
+            Manage Buyers
+        </a>
+
+        <a href="/custom-admin/sellers/" class="nav-link">
+            Manage Sellers
+        </a>
+
+        <a href="/custom-admin/requirements/" class="nav-link">
+            Requirements
+        </a>
+
+        <a href="/custom-admin/offers/" class="nav-link">
+            Offers
+        </a>
+
+        <a href="/custom-admin/orders/" class="nav-link active">
+            Orders
+        </a>
+
+        <a href="/custom-admin/reviews/" class="nav-link">
+            Reviews
+        </a>
+
+        <a href="/custom-admin/logout/" class="nav-link logout-link">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+                <span class="header-label">
+                    MARKETPLACE MANAGEMENT
+                </span>
+
+                <h1>Orders</h1>
+            </div>
+
+            <div class="count-badge">
+                {{ orders|length }} Orders
+            </div>
+
+        </div>
+
+
+        <div class="table-card">
+
+            {% if orders %}
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>BUYER</th>
+                        <th>REQUIREMENT</th>
+                        <th>SELLER</th>
+                        <th>PRICE</th>
+                        <th>STATUS</th>
+                        <th>ORDER DATE</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for order in orders %}
+
+                    <tr>
+
+                        <td>
+                            #{{ order.id }}
+                        </td>
+
+                        <td class="buyer-name">
+                            {{ order.buyer.name }}
+                        </td>
+
+                        <td>
+                            {{ order.offer.requirement.product_type }}
+                        </td>
+
+                        <td class="seller-name">
+                            {{ order.offer.product.seller.name }}
+                        </td>
+
+                        <td class="price">
+                            ₹{{ order.offer.offer_price }}
+                        </td>
+
+                        <td>
+                            {% if order.order_status %}
+                                <span class="status">
+                                    {{ order.order_status }}
+                                </span>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ order.order_date|date:"d M Y" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+                <div class="empty">
+                    No orders found.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+</html>

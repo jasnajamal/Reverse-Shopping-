@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Requirements | Reverse Shopping</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f8f5ed;
+            color: #171715;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            padding: 30px 20px;
+            background: #111111;
+            color: white;
+        }
+
+        .logo {
+            margin-bottom: 45px;
+            color: #d4af37;
+            font-family: Georgia, serif;
+            font-size: 22px;
+        }
+
+        .logo small {
+            display: block;
+            margin-top: 5px;
+            color: #77736a;
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: block;
+            margin-bottom: 8px;
+            padding: 13px 15px;
+            border-radius: 8px;
+            color: #aaa69d;
+            text-decoration: none;
+            font-size: 12px;
+            transition: .2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #24221c;
+            color: #d4af37;
+        }
+
+        /* ===== MAIN ===== */
+
+        .main {
+            margin-left: 240px;
+            padding: 45px;
+        }
+
+        .header {
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-label {
+            color: #a1832c;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .header h1 {
+            margin: 7px 0 0;
+            font-family: Georgia, serif;
+            font-size: 34px;
+            font-weight: 500;
+        }
+
+        .count-badge {
+            padding: 10px 16px;
+            border: 1px solid #ded5c4;
+            border-radius: 8px;
+            background: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* ===== TABLE ===== */
+
+        .table-card {
+            overflow: hidden;
+            border: 1px solid #e2dbce;
+            border-radius: 14px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #171715;
+        }
+
+        th {
+            padding: 16px 18px;
+            color: #d4af37;
+            text-align: left;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 17px 18px;
+            border-bottom: 1px solid #eee8dc;
+            color: #555047;
+            font-size: 11px;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #faf8f2;
+        }
+
+        .product-name {
+            color: #171715;
+            font-weight: 700;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #f2ecdc;
+            color: #8b6d18;
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+        .status-open {
+            background: #e8f4e8;
+            color: #34753b;
+        }
+
+        .status-offer {
+            background: #fff4d6;
+            color: #8a6912;
+        }
+
+        .status-selected {
+            background: #e7edf8;
+            color: #385a8c;
+        }
+
+        .status-closed {
+            background: #eeeae5;
+            color: #6d665e;
+        }
+
+        .empty {
+            padding: 50px;
+            color: #8c8579;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 25px;
+            }
+
+            .table-card {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 900px;
+            }
+        }
+
+        .logout-link {
+            margin-top: 35px;
+            border: 1px solid #3b382f;
+            color: #d4af37;
+        }
+
+        .logout-link:hover {
+            background: #d4af37;
+            color: #111111;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            Reverse Shopping
+            <small>ADMINISTRATION</small>
+        </div>
+
+        <a href="/custom-admin/" class="nav-link">
+            Dashboard
+        </a>
+
+        <a href="/custom-admin/buyers/" class="nav-link">
+            Manage Buyers
+        </a>
+
+        <a href="/custom-admin/sellers/" class="nav-link">
+            Manage Sellers
+        </a>
+
+        <a href="/custom-admin/requirements/" class="nav-link active">
+            Requirements
+        </a>
+
+        <a href="/custom-admin/offers/" class="nav-link">
+            Offers
+        </a>
+
+        <a href="/custom-admin/orders/" class="nav-link">
+            Orders
+        </a>
+
+        <a href="/custom-admin/reviews/" class="nav-link">
+            Reviews
+        </a>
+
+        <a href="/custom-admin/logout/" class="nav-link logout-link">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+                <span class="header-label">
+                    MARKETPLACE MANAGEMENT
+                </span>
+
+                <h1>Requirements</h1>
+            </div>
+
+            <div class="count-badge">
+                {{ requirements|length }} Requirements
+            </div>
+
+        </div>
+
+
+        <div class="table-card">
+
+            {% if requirements %}
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>PRODUCT</th>
+                        <th>BUYER</th>
+                        <th>CATEGORY</th>
+                        <th>BUDGET</th>
+                        <th>STATUS</th>
+                        <th>CREATED</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for requirement in requirements %}
+
+                    <tr>
+
+                        <td>
+                            #{{ requirement.id }}
+                        </td>
+
+                        <td class="product-name">
+                            {{ requirement.product_type }}
+                        </td>
+
+                        <td>
+                            {{ requirement.buyer.name }}
+                        </td>
+
+                        <td>
+                            <span class="category-badge">
+                                {{ requirement.category.name }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if requirement.budget_min and requirement.budget_max %}
+                                ₹{{ requirement.budget_min }} –
+                                ₹{{ requirement.budget_max }}
+                            {% elif requirement.budget_max %}
+                                Up to ₹{{ requirement.budget_max }}
+                            {% elif requirement.budget_min %}
+                                From ₹{{ requirement.budget_min }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+
+                            {% if requirement.status == 'Open' %}
+
+                                <span class="status status-open">
+                                    Open
+                                </span>
+
+                            {% elif requirement.status == 'Offer Received' %}
+
+                                <span class="status status-offer">
+                                    Offer Received
+                                </span>
+
+                            {% elif requirement.status == 'Selected' %}
+
+                                <span class="status status-selected">
+                                    Selected
+                                </span>
+
+                            {% elif requirement.status == 'Closed' %}
+
+                                <span class="status status-closed">
+                                    Closed
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-closed">
+                                    {{ requirement.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ requirement.created_at|date:"d M Y" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+                <div class="empty">
+                    No requirements found.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+</html>
