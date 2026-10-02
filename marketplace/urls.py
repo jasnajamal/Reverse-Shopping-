@@ -26,6 +26,7 @@ urlpatterns = [
     path('custom-admin/buyers/',views.admin_manage_buyers,name='admin_manage_buyers'),
     path('custom-admin/sellers/',views.admin_manage_sellers,name='admin_manage_sellers'),
     path('custom-admin/requirements/',views.admin_manage_requirements,name='admin_manage_requirements'),
+    path('custom-admin/requirements/<int:requirement_id>/close/',views.admin_close_requirement,name='admin_close_requirement'),
     path('custom-admin/offers/',views.admin_manage_offers,name='admin_manage_offers'),
     path('custom-admin/orders/',views.admin_manage_orders,name='admin_manage_orders'),
     path('custom-admin/reviews/',views.admin_manage_reviews,name='admin_manage_reviews'),

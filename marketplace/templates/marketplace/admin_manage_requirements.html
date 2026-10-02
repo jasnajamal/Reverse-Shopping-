@@ -194,6 +194,33 @@
             font-size: 12px;
         }
 
+        .close-button {
+            padding: 7px 13px;
+
+            border: 1px solid #d4af37;
+            border-radius: 6px;
+
+            background: #171715;
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .close-button:hover {
+            background: #d4af37;
+            color: #111111;
+        }
+
+        .action-disabled {
+            color: #999187;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
         @media (max-width: 900px) {
             .sidebar {
                 position: static;
@@ -306,6 +333,7 @@
                         <th>BUDGET</th>
                         <th>STATUS</th>
                         <th>CREATED</th>
+                        <th>ACTION</th>
                     </tr>
                 </thead>
 
@@ -385,6 +413,38 @@
                         <td>
                             {{ requirement.created_at|date:"d M Y" }}
                         </td>
+
+                        <td>
+                            {% if requirement.status != 'Closed' and requirement.status != 'Selected' %}
+
+                                <form
+                                    method="POST"
+                                    action="/custom-admin/requirements/{{ requirement.id }}/close/"
+                                    onsubmit="return confirm('Are you sure you want to close this requirement?');"
+                                >
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="close-button">
+                                        Close
+                                    </button>
+                                </form>
+
+                            {% elif requirement.status == 'Closed' %}
+
+                                <span class="action-disabled">
+                                    Closed
+                                </span>
+
+                            {% else %}
+
+                                <span class="action-disabled">
+                                    Selected
+                                </span>
+
+                            {% endif %}
+                        </td>
+
+                        </tr>
 
                     </tr>
 

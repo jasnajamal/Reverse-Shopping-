@@ -78,6 +78,17 @@
             color: #d4af37;
         }
 
+        .logout-link {
+            margin-top: 35px;
+            border: 1px solid #3b382f;
+            color: #d4af37;
+        }
+
+        .logout-link:hover {
+            background: #d4af37;
+            color: #111111;
+        }
+
         /* ===== MAIN ===== */
 
         .main {
@@ -109,6 +120,14 @@
             font-weight: 500;
         }
 
+        .admin-welcome {
+            margin: 8px 0 0;
+
+            color: #8c8579;
+
+            font-size: 11px;
+        }
+
         .admin-badge {
             padding: 10px 16px;
 
@@ -121,7 +140,7 @@
             font-weight: 700;
         }
 
-        /* ===== STATS ===== */
+        /* ===== STATISTICS ===== */
 
         .stats {
             display: grid;
@@ -139,7 +158,8 @@
             background: white;
         }
 
-        .stat-card span {
+        .stat-card span,
+        .stat-label {
             color: #8c8579;
 
             font-size: 9px;
@@ -147,7 +167,8 @@
             letter-spacing: 1px;
         }
 
-        .stat-card h2 {
+        .stat-card h2,
+        .stat-number {
             margin: 25px 0 0;
 
             color: #171715;
@@ -159,7 +180,6 @@
 
         .stat-card.highlight {
             border-color: #2d2b25;
-
             background: #171715;
         }
 
@@ -171,11 +191,158 @@
             color: #d4af37;
         }
 
+        .average-rating {
+            margin-top: 8px;
+
+            color: #a1832c;
+
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        /* ===== RECENT REQUIREMENTS ===== */
+
+        .recent-section {
+            margin-top: 35px;
+        }
+
+        .recent-header {
+            margin-bottom: 16px;
+
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .recent-label {
+            color: #a1832c;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .recent-header h2 {
+            margin: 6px 0 0;
+
+            color: #171715;
+
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .view-all {
+            padding: 9px 14px;
+
+            border: 1px solid #d8cfbd;
+            border-radius: 7px;
+
+            background: white;
+            color: #7b641f;
+
+            text-decoration: none;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            transition: .2s ease;
+        }
+
+        .view-all:hover {
+            border-color: #d4af37;
+            background: #171715;
+            color: #d4af37;
+        }
+
+        .recent-table {
+            overflow: hidden;
+
+            border: 1px solid #e2dbce;
+            border-radius: 13px;
+
+            background: white;
+        }
+
+        .recent-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .recent-table thead {
+            background: #171715;
+        }
+
+        .recent-table th {
+            padding: 15px 18px;
+
+            color: #d4af37;
+            text-align: left;
+
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .recent-table td {
+            padding: 16px 18px;
+
+            border-bottom: 1px solid #eee8dc;
+
+            color: #625d54;
+
+            font-size: 10px;
+        }
+
+        .recent-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .recent-table tbody tr:hover {
+            background: #faf8f2;
+        }
+
+        .recent-product {
+            color: #171715 !important;
+            font-weight: 700;
+        }
+
+        .requirement-status {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            background: #f2ecdc;
+            color: #7b641f;
+
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+        .no-data {
+            padding: 40px;
+
+            color: #8c8579;
+            text-align: center;
+
+            font-size: 11px;
+        }
+
         /* ===== RESPONSIVE ===== */
 
         @media (max-width: 900px) {
             .stats {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .recent-table {
+                overflow-x: auto;
+            }
+
+            .recent-table table {
+                min-width: 700px;
             }
         }
 
@@ -195,30 +362,11 @@
             .stats {
                 grid-template-columns: 1fr;
             }
-        }
 
-        .logout-link {
-            margin-top: 35px;
-            border: 1px solid #3b382f;
-            color: #d4af37;
-        }
-
-        .logout-link:hover {
-            background: #d4af37;
-            color: #111111;
-        }
-
-        .admin-welcome {
-            margin: 8px 0 0;
-            color: #8c8579;
-            font-size: 11px;
-        }
-
-        .average-rating {
-            margin-top: 8px;
-            color: #a1832c;
-            font-size: 9px;
-            font-weight: 700;
+            .header {
+                align-items: flex-start;
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -237,10 +385,6 @@
         <a href="/custom-admin/" class="nav-link active">
             Dashboard
         </a>
-
-        <p class="admin-welcome">
-            Logged in as {{ request.session.admin_username }}
-        </p>
 
         <a href="/custom-admin/buyers/" class="nav-link">
             Manage Buyers
@@ -277,9 +421,12 @@
 
     <main class="main">
 
+        <!-- HEADER -->
+
         <div class="header">
 
             <div>
+
                 <span class="header-label">
                     ADMINISTRATION
                 </span>
@@ -287,6 +434,11 @@
                 <h1>
                     Dashboard
                 </h1>
+
+                <p class="admin-welcome">
+                    Logged in as {{ request.session.admin_username }}
+                </p>
+
             </div>
 
             <div class="admin-badge">
@@ -326,21 +478,124 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-label">REVIEWS</div>
+
+                <div class="stat-label">
+                    REVIEWS
+                </div>
 
                 <div class="stat-number">
                     {{ total_reviews }}
                 </div>
 
                 {% if average_rating %}
+
                     <div class="average-rating">
                         ★ {{ average_rating|floatformat:1 }} / 5 Average Rating
                     </div>
+
                 {% else %}
+
                     <div class="average-rating">
                         No ratings yet
                     </div>
+
                 {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- RECENT REQUIREMENTS -->
+
+        <section class="recent-section">
+
+            <div class="recent-header">
+
+                <div>
+
+                    <span class="recent-label">
+                        RECENT ACTIVITY
+                    </span>
+
+                    <h2>
+                        Recent Requirements
+                    </h2>
+
+                </div>
+
+                <a
+                    href="/custom-admin/requirements/"
+                    class="view-all"
+                >
+                    View All
+                </a>
+
+            </div>
+
+
+            <div class="recent-table">
+
+                {% if recent_requirements %}
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>PRODUCT</th>
+                            <th>BUYER</th>
+                            <th>CATEGORY</th>
+                            <th>STATUS</th>
+                            <th>DATE</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for requirement in recent_requirements %}
+
+                        <tr>
+
+                            <td class="recent-product">
+                                {{ requirement.product_type }}
+                            </td>
+
+                            <td>
+                                {{ requirement.buyer.name }}
+                            </td>
+
+                            <td>
+                                {{ requirement.category.name }}
+                            </td>
+
+                            <td>
+                                <span class="requirement-status">
+                                    {{ requirement.status }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ requirement.created_at|date:"d M Y" }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+                {% else %}
+
+                    <div class="no-data">
+                        No requirements available.
+                    </div>
+
+                {% endif %}
+
             </div>
 
         </section>
@@ -348,4 +603,5 @@
     </main>
 
 </body>
+
 </html>

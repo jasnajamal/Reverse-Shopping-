@@ -914,9 +914,15 @@ def custom_admin_dashboard(request):
         'total_orders': Orders.objects.count(),
 
         'total_reviews': Reviews.objects.count(),
+
         'average_rating': Reviews.objects.aggregate(
             Avg('rating')
         )['rating__avg'],
+
+        'recent_requirements': Requirements.objects.select_related(
+            'buyer',
+            'category'
+        ).order_by('-id')[:5],
     }
 
     return render(
@@ -1037,3 +1043,35 @@ def custom_admin_logout(request):
     request.session.pop('admin_username', None)
 
     return redirect('/')
+
+def admin_close_requirement(request, requirement_id):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    if request.method != 'POST':
+        return redirect('/custom-admin/requirements/')
+
+    try:
+        requirement = Requirements.objects.get(id=requirement_id)
+
+        if requirement.status not in ['Closed', 'Selected']:
+            requirement.status = 'Closed'
+            requirement.save(update_fields=['status'])
+
+            messages.success(
+                request,
+                'Requirement closed successfully.'
+            )
+        else:
+            messages.info(
+                request,
+                'This requirement cannot be closed.'
+            )
+
+    except Requirements.DoesNotExist:
+        messages.error(
+            request,
+            'Requirement not found.'
+        )
+
+    return redirect('/custom-admin/requirements/')
