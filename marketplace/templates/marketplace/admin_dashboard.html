@@ -156,6 +156,10 @@
             border-radius: 13px;
 
             background: white;
+
+            cursor: pointer;
+            text-decoration: none;
+            transition: .2s ease;
         }
 
         .stat-card span,
@@ -368,6 +372,17 @@
                 gap: 20px;
             }
         }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #d4af37;
+            box-shadow: 0 12px 28px rgba(35,30,20,.08);
+        }
+
+        .stat-card.highlight:hover {
+            border-color: #d4af37;
+        }
+
     </style>
 </head>
 
@@ -452,32 +467,68 @@
 
         <section class="stats">
 
-            <div class="stat-card highlight">
+            <a href="/custom-admin/buyers/"
+            class="stat-card highlight">
+
                 <span>TOTAL BUYERS</span>
-                <h2>{{ total_buyers }}</h2>
-            </div>
 
-            <div class="stat-card">
+                <h2>
+                    {{ total_buyers }}
+                </h2>
+
+            </a>
+
+
+            <a href="/custom-admin/sellers/"
+            class="stat-card">
+
                 <span>TOTAL SELLERS</span>
-                <h2>{{ total_sellers }}</h2>
-            </div>
 
-            <div class="stat-card">
+                <h2>
+                    {{ total_sellers }}
+                </h2>
+
+            </a>
+
+
+            <a href="/custom-admin/requirements/"
+            class="stat-card">
+
                 <span>REQUIREMENTS</span>
-                <h2>{{ total_requirements }}</h2>
-            </div>
 
-            <div class="stat-card">
+                <h2>
+                    {{ total_requirements }}
+                </h2>
+
+            </a>
+
+
+            <a href="/custom-admin/offers/"
+            class="stat-card">
+
                 <span>OFFERS</span>
-                <h2>{{ total_offers }}</h2>
-            </div>
 
-            <div class="stat-card">
+                <h2>
+                    {{ total_offers }}
+                </h2>
+
+            </a>
+
+
+            <a href="/custom-admin/orders/"
+            class="stat-card">
+
                 <span>SELECTED ORDERS</span>
-                <h2>{{ total_orders }}</h2>
-            </div>
 
-            <div class="stat-card">
+                <h2>
+                    {{ total_orders }}
+                </h2>
+
+            </a>
+
+
+            <a href="/custom-admin/reviews/"
+            class="stat-card">
 
                 <div class="stat-label">
                     REVIEWS
@@ -501,7 +552,7 @@
 
                 {% endif %}
 
-            </div>
+            </a>
 
         </section>
 

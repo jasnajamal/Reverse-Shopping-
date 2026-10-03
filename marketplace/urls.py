@@ -27,9 +27,12 @@ urlpatterns = [
     path('custom-admin/sellers/',views.admin_manage_sellers,name='admin_manage_sellers'),
     path('custom-admin/requirements/',views.admin_manage_requirements,name='admin_manage_requirements'),
     path('custom-admin/requirements/<int:requirement_id>/close/',views.admin_close_requirement,name='admin_close_requirement'),
+    path('custom-admin/offers/<int:offer_id>/remove/',views.admin_remove_offer,name='admin_remove_offer'),
     path('custom-admin/offers/',views.admin_manage_offers,name='admin_manage_offers'),
     path('custom-admin/orders/',views.admin_manage_orders,name='admin_manage_orders'),
     path('custom-admin/reviews/',views.admin_manage_reviews,name='admin_manage_reviews'),
+    path('custom-admin/reviews/<int:review_id>/delete/',views.admin_delete_review,name='admin_delete_review'),
     path('custom-admin/logout/',views.custom_admin_logout,name='custom_admin_logout'),
+    path('seller/<int:seller_id>/',views.seller_public_profile,name='seller_public_profile'),
 
 ]

@@ -239,12 +239,24 @@ def seller_dashboard(request):
         is_read=False
     ).count()
 
+    seller_reviews = Reviews.objects.filter(
+        seller_id=seller_id
+    )
+
+    average_rating = seller_reviews.aggregate(
+        Avg('rating')
+    )['rating__avg']
+
+    total_reviews = seller_reviews.count()
+
     return render(
         request,
         'marketplace/seller_dashboard.html',
         {
             'seller': seller,
-            'unread_count': unread_count
+            'unread_count': unread_count,
+            'average_rating': average_rating,
+            'total_reviews': total_reviews
         }
     )
     
@@ -602,6 +614,17 @@ def view_offers(request, requirement_id):
             buyer_id=buyer_id
         ).first()
 
+    for offer in offers:
+        seller_reviews = Reviews.objects.filter(
+            seller_id=offer.product.seller_id
+        )
+
+        offer.seller_average_rating = seller_reviews.aggregate(
+            Avg('rating')
+        )['rating__avg']
+
+        offer.seller_review_count = seller_reviews.count()
+
     return render(
         request,
         'marketplace/view_offers.html',
@@ -648,7 +671,7 @@ def select_offer(request, offer_id):
     Orders.objects.create(
         buyer_id=buyer_id,
         offer=offer,
-        order_status='selected',
+        order_status='pending',
         order_date=timezone.now()
     )
 
@@ -990,6 +1013,8 @@ def admin_manage_offers(request):
         'requirement',
         'product',
         'product__seller'
+    ).prefetch_related(
+        'orders_set'
     ).order_by('-id')
 
     return render(
@@ -1038,11 +1063,30 @@ def admin_manage_reviews(request):
         }
     )
 
-def custom_admin_logout(request):
-    request.session.pop('admin_logged_in', None)
-    request.session.pop('admin_username', None)
+def admin_delete_review(request, review_id):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
 
-    return redirect('/')
+    if request.method != 'POST':
+        return redirect('/custom-admin/reviews/')
+
+    try:
+        review = Reviews.objects.get(id=review_id)
+
+        review.delete()
+
+        messages.success(
+            request,
+            'Review deleted successfully.'
+        )
+
+    except Reviews.DoesNotExist:
+        messages.error(
+            request,
+            'Review not found.'
+        )
+
+    return redirect('/custom-admin/reviews/')
 
 def admin_close_requirement(request, requirement_id):
     if not request.session.get('admin_logged_in'):
@@ -1052,11 +1096,15 @@ def admin_close_requirement(request, requirement_id):
         return redirect('/custom-admin/requirements/')
 
     try:
-        requirement = Requirements.objects.get(id=requirement_id)
+        requirement = Requirements.objects.get(
+            id=requirement_id
+        )
 
         if requirement.status not in ['Closed', 'Selected']:
             requirement.status = 'Closed'
-            requirement.save(update_fields=['status'])
+            requirement.save(
+                update_fields=['status']
+            )
 
             messages.success(
                 request,
@@ -1075,3 +1123,82 @@ def admin_close_requirement(request, requirement_id):
         )
 
     return redirect('/custom-admin/requirements/')
+
+def admin_remove_offer(request, offer_id):
+    if not request.session.get('admin_logged_in'):
+        return redirect('/')
+
+    if request.method != 'POST':
+        return redirect('/custom-admin/offers/')
+
+    try:
+        offer = Offers.objects.get(id=offer_id)
+
+        # Do not delete an offer that has already been selected
+        if Orders.objects.filter(offer=offer).exists():
+            messages.error(
+                request,
+                'Selected offer cannot be removed.'
+            )
+            return redirect('/custom-admin/offers/')
+
+        offer.delete()
+
+        messages.success(
+            request,
+            'Offer removed successfully.'
+        )
+
+    except Offers.DoesNotExist:
+        messages.error(
+            request,
+            'Offer not found.'
+        )
+
+    return redirect('/custom-admin/offers/')
+
+def custom_admin_logout(request):
+    request.session.pop('admin_logged_in', None)
+    request.session.pop('admin_username', None)
+
+    return redirect('/')
+
+def seller_public_profile(request, seller_id):
+    buyer_id = request.session.get('user_id')
+
+    if not buyer_id:
+        return redirect('/login/')
+
+    if request.session.get('user_role') != 'buyer':
+        return redirect('/login/')
+
+    seller = Users.objects.select_related(
+        'category'
+    ).get(
+        id=seller_id,
+        role='seller'
+    )
+
+    reviews = Reviews.objects.filter(
+        seller_id=seller_id
+    ).select_related(
+        'buyer'
+    ).order_by('-id')
+
+    average_rating = reviews.aggregate(
+        Avg('rating')
+    )['rating__avg']
+
+    total_reviews = reviews.count()
+
+    return render(
+        request,
+        'marketplace/seller_public_profile.html',
+        {
+            'seller': seller,
+            'reviews': reviews,
+            'average_rating': average_rating,
+            'total_reviews': total_reviews
+        }
+    )
+

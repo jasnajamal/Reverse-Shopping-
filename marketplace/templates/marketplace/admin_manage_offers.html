@@ -169,6 +169,35 @@
             font-weight: 800;
         }
 
+        /* ===== ACTION ===== */
+
+        .remove-button {
+            padding: 7px 13px;
+            border: 1px solid #b34a3c;
+            border-radius: 6px;
+            background: white;
+            color: #a23c30;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .remove-button:hover {
+            background: #a23c30;
+            color: white;
+        }
+
+        .protected-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #f2ecdc;
+            color: #75601e;
+            font-size: 8px;
+            font-weight: 800;
+        }
+
         .empty {
             padding: 50px;
             color: #8c8579;
@@ -195,7 +224,7 @@
             }
 
             table {
-                min-width: 900px;
+                min-width: 1000px;
             }
         }
 
@@ -291,6 +320,7 @@
                         <th>DELIVERY</th>
                         <th>WARRANTY</th>
                         <th>CREATED</th>
+                        <th>ACTION</th>
                     </tr>
                 </thead>
 
@@ -340,6 +370,31 @@
 
                         <td>
                             {{ offer.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td>
+                            {% if offer.orders_set.all %}
+                                <span class="protected-badge">
+                                    Selected
+                                </span>
+                            {% else %}
+
+                                <form
+                                    method="POST"
+                                    action="/custom-admin/offers/{{ offer.id }}/remove/"
+                                    onsubmit="return confirm('Are you sure you want to remove this offer?');"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="remove-button"
+                                    >
+                                        Remove
+                                    </button>
+                                </form>
+
+                            {% endif %}
                         </td>
 
                     </tr>

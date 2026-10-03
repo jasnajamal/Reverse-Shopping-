@@ -1460,6 +1460,59 @@
             font-size: 11px;
             line-height: 1.7;
         }
+
+        /* ================= SELLER RATING ================= */
+
+        .bo-seller-rating {
+            margin-top: 9px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            font-size: 9px;
+        }
+
+        .bo-rating-star {
+            color: #d4af37;
+            font-size: 13px;
+        }
+
+        .bo-rating-score {
+            color: #f1e2a5;
+            font-weight: 800;
+        }
+
+        .bo-rating-count {
+            color: #99948a;
+            font-weight: 600;
+        }
+
+        .bo-no-rating {
+            color: #99948a;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .bo-view-seller {
+            display: inline-flex;
+            align-items: center;
+
+            margin-top: 12px;
+
+            color: #d4af37;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .3px;
+
+            transition: .2s ease;
+        }
+
+        .bo-view-seller:hover {
+            color: #ffffff;
+            transform: translateX(3px);
+        }
     </style>
 </head>
 
@@ -1820,6 +1873,41 @@
                                 {{ offer.product.seller.name }}
                             </strong>
                         </p>
+
+                        {% if offer.seller_average_rating %}
+
+                            <div class="bo-seller-rating">
+
+                                <span class="bo-rating-star">★</span>
+
+                                <span class="bo-rating-score">
+                                    {{ offer.seller_average_rating|floatformat:1 }} / 5
+                                </span>
+
+                                <span class="bo-rating-count">
+                                    ({{ offer.seller_review_count }}
+                                    Review{{ offer.seller_review_count|pluralize }})
+                                </span>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="bo-seller-rating">
+                                <span class="bo-rating-star">☆</span>
+                                <span class="bo-no-rating">
+                                    No ratings yet
+                                </span>
+                            </div>
+
+                        {% endif %}
+
+                        <a
+                            href="{% url 'seller_public_profile' offer.product.seller.id %}"
+                            class="bo-view-seller"
+                        >
+                            View Seller Profile →
+                        </a>
 
                     </div>
 

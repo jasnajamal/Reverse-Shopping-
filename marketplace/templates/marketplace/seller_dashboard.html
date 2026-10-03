@@ -1265,6 +1265,49 @@
 
             vertical-align: middle;
         }
+
+        /* ===== SELLER RATING ===== */
+
+        .sd-rating-summary {
+            margin-top: 22px;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 11px 15px;
+
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            border-radius: 9px;
+
+            background: rgba(212, 175, 55, 0.07);
+        }
+
+        .sd-rating-star {
+            color: #d4af37;
+            font-size: 18px;
+        }
+
+        .sd-rating-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sd-rating-info strong {
+            color: #ffffff;
+            font-size: 12px;
+        }
+
+        .sd-rating-info small {
+            color: #999386;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: .6px;
+        }
+
+        
     </style>
 </head>
 
@@ -1321,6 +1364,43 @@
                 and manage your selling activity from one refined
                 marketplace workspace.
             </p>
+
+            {% if average_rating %}
+
+                <div class="sd-rating-summary">
+
+                    <span class="sd-rating-star">★</span>
+
+                    <div class="sd-rating-info">
+                        <strong>
+                            {{ average_rating|floatformat:1 }} / 5
+                        </strong>
+
+                        <small>
+                            {{ total_reviews }}
+                            Review{{ total_reviews|pluralize }}
+                        </small>
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="sd-rating-summary">
+
+                    <span class="sd-rating-star">☆</span>
+
+                    <div class="sd-rating-info">
+                        <strong>No ratings yet</strong>
+
+                        <small>
+                            Your buyer ratings will appear here
+                        </small>
+                    </div>
+
+                </div>
+
+            {% endif %}
 
 
             <div class="sd-hero-buttons">
