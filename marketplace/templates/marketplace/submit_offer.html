@@ -91,7 +91,7 @@
 
         .so-brand-text small {
             color: #928b7e;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: 1.4px;
             text-transform: uppercase;
@@ -105,7 +105,7 @@
 
             color: #28251f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             transition: 0.2s ease;
@@ -183,7 +183,7 @@
 
             color: #dfc66f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             letter-spacing: 2.2px;
@@ -311,7 +311,7 @@
         .so-small-label {
             color: #a98b32;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.7px;
@@ -331,7 +331,7 @@
 
             color: #918d83;
 
-            font-size: 10px;
+            font-size: 13px;
 
             line-height: 1.6;
         }
@@ -358,7 +358,7 @@
         .so-requirement-item span {
             color: #989082;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.1px;
@@ -428,7 +428,7 @@
         .so-form-header span {
             color: #967616;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.7px;
@@ -522,7 +522,7 @@
         .so-section-title small {
             color: #a08f5b;
 
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.3px;
@@ -560,7 +560,7 @@
         .so-field label {
             color: #4e493f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -582,7 +582,7 @@
 
             color: #24221e;
 
-            font-size: 12px;
+            font-size: 14px;
 
             transition:
                 border-color 0.2s ease,
@@ -621,7 +621,7 @@
         .so-helper {
             color: #999185;
 
-            font-size: 9px;
+            font-size: 12px;
 
             line-height: 1.5;
         }
@@ -701,13 +701,13 @@
 
             color: #312e28;
 
-            font-size: 11px;
+            font-size: 13px;
         }
 
         .so-upload-copy span {
             color: #928b7e;
 
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .so-upload-box input[type="file"] {
@@ -726,7 +726,7 @@
 
             color: #665f54;
 
-            font-size: 10px;
+            font-size: 13px;
         }
 
         .so-upload-box input[type="file"]::file-selector-button {
@@ -741,7 +741,7 @@
 
             color: #d4af37;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
 
             cursor: pointer;
@@ -782,7 +782,7 @@
 
             color: #74694c;
 
-            font-size: 10px;
+            font-size: 13px;
 
             line-height: 1.6;
         }
@@ -810,7 +810,7 @@
 
             color: #8b8478;
 
-            font-size: 9px;
+            font-size: 12px;
 
             line-height: 1.6;
         }
@@ -834,7 +834,7 @@
 
             color: #d4af37;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             cursor: pointer;
@@ -874,7 +874,7 @@
 
             color: #3e3931;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -942,7 +942,7 @@
         .so-footer-brand strong {
             color: #181816;
 
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .so-footer p,
@@ -951,7 +951,7 @@
 
             color: #817b70;
 
-            font-size: 9px;
+            font-size: 12px;
         }
 
         /* =========================
@@ -1240,11 +1240,13 @@
 
                                 <label>
                                     Product Description
+                                    <span class="so-required">*</span>
                                 </label>
 
                                 <textarea
                                     name="product_description"
                                     placeholder="Describe the product, specifications and important details"
+                                    required
                                 ></textarea>
 
                             </div>
@@ -1261,6 +1263,7 @@
                                     type="number"
                                     name="product_price"
                                     step="0.01"
+                                    min="0.01"
                                     placeholder="0.00"
                                     required
                                 >
@@ -1299,12 +1302,14 @@
 
                                 <label>
                                     Brand
+                                    <span class="so-required">*</span>
                                 </label>
 
                                 <input
                                     type="text"
                                     name="brand"
-                                    placeholder="Enter product brand"
+                                    placeholder="Enter brand or Unbranded"
+                                    required
                                 >
 
                             </div>
@@ -1315,6 +1320,7 @@
 
                                 <label>
                                     Product Image
+                                    <span class="so-required">*</span>
                                 </label>
 
                                 <div class="so-upload-box">
@@ -1338,6 +1344,7 @@
                                         name="product_image"
                                         accept="image/*"
                                         multiple
+                                        required
                                     >
 
                                 </div>
@@ -1390,6 +1397,7 @@
                                     type="number"
                                     name="offer_price"
                                     step="0.01"
+                                    min="0.01"
                                     placeholder="0.00"
                                     required
                                 >
@@ -1401,12 +1409,16 @@
 
                                 <label>
                                     Delivery Days
+                                    <span class="so-required">*</span>
                                 </label>
 
                                 <input
                                     type="number"
                                     name="delivery_days"
+                                    min="0"
+                                    step="1"
                                     placeholder="Example: 3"
+                                    required
                                 >
 
                             </div>
@@ -1416,12 +1428,14 @@
 
                                 <label>
                                     Warranty
+                                    <span class="so-required">*</span>
                                 </label>
 
                                 <input
                                     type="text"
                                     name="warranty"
-                                    placeholder="Example: 1 year manufacturer warranty"
+                                    placeholder="Example: 1 year warranty or No Warranty"
+                                    required
                                 >
 
                             </div>

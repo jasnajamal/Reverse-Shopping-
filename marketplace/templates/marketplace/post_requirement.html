@@ -93,7 +93,7 @@
         .pr-brand-copy small {
             color: #928b7e;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: 1.4px;
             text-transform: uppercase;
@@ -107,7 +107,7 @@
 
             color: #28251f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             transition: .2s ease;
@@ -182,7 +182,7 @@
 
             color: #dfc66f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 2.2px;
         }
@@ -287,7 +287,7 @@
 
             color: #8d887d;
 
-            font-size: 6px;
+            font-size: 10px;
             font-weight: 800;
             letter-spacing: 1.1px;
         }
@@ -311,7 +311,7 @@
         .pr-intro > span {
             color: #967616;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 1.8px;
         }
@@ -333,7 +333,7 @@
 
             color: #797267;
 
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.7;
         }
 
@@ -367,7 +367,7 @@
         .pr-card-header small {
             color: #a98b32;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 1.7px;
         }
@@ -454,7 +454,7 @@
         .pr-section-heading small {
             color: #a08f5b;
 
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 1.3px;
         }
@@ -494,7 +494,7 @@
         .pr-field label {
             color: #4e493f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -516,7 +516,7 @@
 
             color: #24221e;
 
-            font-size: 12px;
+            font-size: 14px;
 
             transition: .2s ease;
         }
@@ -552,7 +552,7 @@
         .pr-field-help {
             color: #9a9387;
 
-            font-size: 8px;
+            font-size: 11px;
             line-height: 1.5;
         }
 
@@ -694,7 +694,7 @@
         .pr-upload-content span {
             color: #8c8578;
 
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -741,7 +741,7 @@
 
             color: #8b8478;
 
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -762,7 +762,7 @@
             background: #111;
             color: #d4af37;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             cursor: pointer;
@@ -798,7 +798,7 @@
 
             color: #3e3931;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -859,7 +859,7 @@
         }
 
         .pr-footer-brand strong {
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .pr-footer p,
@@ -868,7 +868,7 @@
 
             color: #817b70;
 
-            font-size: 9px;
+            font-size: 12px;
         }
 
         /* =========================
@@ -1195,9 +1195,10 @@
 
                             <label>
                                 Preferred Condition
+                                <span class="pr-required">*</span>
                             </label>
 
-                            <select name="condition_type">
+                            <select name="condition_type" required>
 
                                 <option value="">
                                     Select Condition
@@ -1256,6 +1257,7 @@
 
                             <label>
                                 Minimum Budget
+                                <span class="pr-required">*</span>
                             </label>
 
                             <div class="pr-price-wrap">
@@ -1264,7 +1266,9 @@
                                     type="number"
                                     name="budget_min"
                                     step="0.01"
+                                    min="0.01"
                                     placeholder="0.00"
+                                    required
                                 >
 
                             </div>
@@ -1281,6 +1285,7 @@
 
                             <label>
                                 Maximum Budget
+                                <span class="pr-required">*</span>
                             </label>
 
                             <div class="pr-price-wrap">
@@ -1289,7 +1294,9 @@
                                     type="number"
                                     name="budget_max"
                                     step="0.01"
+                                    min="0.01"
                                     placeholder="0.00"
+                                    required
                                 >
 
                             </div>
@@ -1466,11 +1473,13 @@
 
                                 <label>
                                     Required By
+                                    <span class="pr-required">*</span>
                                 </label>
 
                                 <input
                                     type="date"
                                     name="required_by"
+                                    required
                                 >
 
                                 <span class="pr-field-help">

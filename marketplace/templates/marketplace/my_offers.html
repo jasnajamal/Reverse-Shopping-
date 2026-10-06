@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,7 +86,7 @@
         .mo-brand-text small {
             color: #928b7e;
 
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 700;
 
             letter-spacing: 1.4px;
@@ -100,7 +101,7 @@
 
         .mo-account {
             color: #716b60;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 700;
         }
 
@@ -130,7 +131,7 @@
 
             color: #28251f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             transition: .2s ease;
@@ -207,7 +208,7 @@
 
             color: #dfc66f;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
 
             letter-spacing: 2.2px;
@@ -304,7 +305,7 @@
         .mo-visual-label {
             color: #a98b32;
 
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.5px;
@@ -343,12 +344,12 @@
 
             color: #8e897f;
 
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .mo-visual-row strong {
             color: #d6d1c6;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         /* =========================
@@ -376,7 +377,7 @@
         .mo-section-label {
             color: #967616;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
 
             letter-spacing: 1.9px;
@@ -398,7 +399,7 @@
 
             color: #797267;
 
-            font-size: 12px;
+            font-size: 14px;
 
             line-height: 1.7;
         }
@@ -415,7 +416,7 @@
 
             color: #665e50;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
         }
 
@@ -492,7 +493,7 @@
         .mo-card-eyebrow {
             color: #a98b32;
 
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.5px;
@@ -525,7 +526,7 @@
             color: #d4af37;
 
             font-family: Georgia, serif;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         /* =========================
@@ -553,7 +554,7 @@
 
             color: #989082;
 
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
 
             letter-spacing: 1.1px;
@@ -564,7 +565,7 @@
         .mo-requirement strong {
             color: #39352e;
 
-            font-size: 12px;
+            font-size: 14px;
 
             line-height: 1.5;
         }
@@ -598,7 +599,7 @@
         .mo-info-item strong {
             color: #302d27;
 
-            font-size: 12px;
+            font-size: 14px;
 
             line-height: 1.4;
         }
@@ -647,7 +648,7 @@
         .mo-action-note {
             color: #918a7e;
 
-            font-size: 9px;
+            font-size: 12px;
 
             line-height: 1.5;
         }
@@ -671,17 +672,13 @@
 
             color: #d4af37;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
 
             transition: .2s ease;
         }
 
-        .mo-update-btn span {
-            font-size: 15px;
-        }
-
-        .mo-update-btn:hover {
+        a.mo-update-btn:hover {
             transform: translateY(-2px);
 
             background: #d4af37;
@@ -742,7 +739,7 @@
 
             color: #817a6e;
 
-            font-size: 11px;
+            font-size: 13px;
 
             line-height: 1.7;
         }
@@ -764,7 +761,7 @@
 
             color: #d4af37;
 
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
         }
 
@@ -784,7 +781,7 @@
 
             color: #3e3931;
 
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -850,7 +847,7 @@
         }
 
         .mo-footer-brand strong {
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .mo-footer p,
@@ -859,7 +856,7 @@
 
             color: #817b70;
 
-            font-size: 9px;
+            font-size: 12px;
         }
 
         /* =========================
@@ -954,7 +951,6 @@
     </style>
 </head>
 
-
 <body class="seller-offers-page">
 
     <!-- NAVBAR -->
@@ -972,7 +968,6 @@
             </span>
 
         </a>
-
 
         <div class="mo-nav-actions">
 
@@ -1182,17 +1177,55 @@
                     <!-- ACTION -->
                     <div class="mo-card-action">
 
-                        <span class="mo-action-note">
-                            Need to change your price or product details?
-                        </span>
+                        {% if offer.requirement.status == 'Open' or offer.requirement.status == 'Offer Received' %}
 
-                        <a
-                            href="/update-offer/{{ offer.id }}/"
-                            class="mo-update-btn"
-                        >
-                            Update Offer
-                            <span>→</span>
-                        </a>
+                            <span class="mo-action-note">
+                                Need to change your price or product details?
+                            </span>
+
+                            <a
+                                href="/update-offer/{{ offer.id }}/"
+                                class="mo-update-btn"
+                            >
+                                Update Offer
+                                <span>→</span>
+                            </a>
+
+                        {% elif offer.requirement.status == 'Selected' %}
+
+                            {% if offer.is_selected %}
+
+                                <span class="mo-action-note">
+                                    The buyer selected your offer.
+                                </span>
+
+                                <span class="mo-update-btn">
+                                    Your Offer Selected
+                                </span>
+
+                            {% else %}
+
+                                <span class="mo-action-note">
+                                    The buyer selected another seller's offer.
+                                </span>
+
+                                <span class="mo-update-btn">
+                                    Another Offer Selected
+                                </span>
+
+                            {% endif %}
+
+                        {% elif offer.requirement.status == 'Closed' %}
+
+                            <span class="mo-action-note">
+                                The buyer closed this requirement.
+                            </span>
+
+                            <span class="mo-update-btn">
+                                Requirement Closed
+                            </span>
+
+                        {% endif %}
 
                     </div>
 
@@ -1279,4 +1312,5 @@
     </footer>
 
 </body>
+
 </html>

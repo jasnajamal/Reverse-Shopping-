@@ -6,13 +6,33 @@ from .models import Users, Requirements, Categories, Products, Offers, Orders, R
 from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.db.models import Avg
+from django.views.decorators.cache import never_cache
+from decimal import Decimal, InvalidOperation
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
+def validate_image_file(image):
+    allowed_types = [
+        'image/jpeg',
+        'image/png',
+        'image/webp'
+    ]
+
+    max_size = 5 * 1024 * 1024  # 5 MB
+
+    if image.content_type not in allowed_types:
+        return 'Only JPG, PNG, and WEBP images are allowed.'
+
+    if image.size > max_size:
+        return 'Each image must be 5 MB or smaller.'
+
+    return None
 
 def home(request):
     return render(request, 'marketplace/home.html')
 
-
+@never_cache
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -45,38 +65,138 @@ def login_view(request):
     return render(request, 'marketplace/login.html')
 
 def register_view(request):
+    categories = Categories.objects.all()
+
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        role = request.POST.get('role')
-        category_id = request.POST.get('category_id')
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+        role = request.POST.get('role', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
 
-        if Users.objects.filter(email=email).exists():
-            messages.error(request, 'Email already registered.')
+        # Required field validation
+        if not name:
+            messages.error(request, 'Full name is required.')
             return render(
                 request,
                 'marketplace/register.html',
-                {'categories': Categories.objects.all()}
+                {'categories': categories}
             )
 
+        if not email:
+            messages.error(request, 'Email address is required.')
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(
+                request,
+                'Please enter a valid email address.'
+            )
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+        
+        if len(name) > 100:
+            messages.error(
+                request,
+                'Full name must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        if len(email) > 100:
+            messages.error(
+                request,
+                'Email address must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        if not password:
+            messages.error(request, 'Password is required.')
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        # Basic password length validation
+        if len(password) < 8:
+            messages.error(
+                request,
+                'Password must contain at least 8 characters.'
+            )
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        # Duplicate email validation
+        if Users.objects.filter(email__iexact=email).exists():
+            messages.error(
+                request,
+                'Email already registered.'
+            )
+            return render(
+                request,
+                'marketplace/register.html',
+                {'categories': categories}
+            )
+
+        # Role validation
         if role not in ['buyer', 'seller']:
-            messages.error(request, 'Please select a valid role.')
+            messages.error(
+                request,
+                'Please select a valid role.'
+            )
             return render(
                 request,
                 'marketplace/register.html',
-                {'categories': Categories.objects.all()}
+                {'categories': categories}
             )
 
-        if role == 'seller' and not category_id:
-            messages.error(request, 'Please select a selling category.')
-            return render(
-                request,
-                'marketplace/register.html',
-                {'categories': Categories.objects.all()}
-            )
+        # Seller category validation
+        if role == 'seller':
+            if not category_id:
+                messages.error(
+                    request,
+                    'Please select a selling category.'
+                )
+                return render(
+                    request,
+                    'marketplace/register.html',
+                    {'categories': categories}
+                )
 
-        if role == 'buyer':
+            if not Categories.objects.filter(
+                id=category_id
+            ).exists():
+                messages.error(
+                    request,
+                    'Please select a valid selling category.'
+                )
+                return render(
+                    request,
+                    'marketplace/register.html',
+                    {'categories': categories}
+                )
+
+        else:
             category_id = None
 
         Users.objects.create(
@@ -87,10 +207,11 @@ def register_view(request):
             category_id=category_id
         )
 
-        messages.success(request, 'Registration successful. Please login.')
+        messages.success(
+            request,
+            'Registration successful. Please login.'
+        )
         return redirect('/login/')
-
-    categories = Categories.objects.all()
 
     return render(
         request,
@@ -98,6 +219,7 @@ def register_view(request):
         {'categories': categories}
     )
 
+@never_cache
 def buyer_dashboard(request):
     buyer_id = request.session.get('user_id')
 
@@ -107,10 +229,18 @@ def buyer_dashboard(request):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    buyer = Users.objects.get(
-        id=buyer_id,
-        role='buyer'
-    )
+    try:
+        buyer = Users.objects.get(
+            id=buyer_id,
+            role='buyer'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Buyer account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
     unread_count = Notifications.objects.filter(
         user_id=buyer_id,
@@ -126,6 +256,7 @@ def buyer_dashboard(request):
         }
     )
 
+@never_cache
 def post_requirement(request):
     buyer_id = request.session.get('user_id')
 
@@ -135,31 +266,228 @@ def post_requirement(request):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    buyer = Users.objects.get(id=buyer_id, role='buyer')
+    try:
+        buyer = Users.objects.get(
+            id=buyer_id,
+            role='buyer'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Buyer account not found. Please log in again.'
+        )
+        return redirect('/login/')
+
+    categories = Categories.objects.all()
 
     if request.method == 'POST':
-        product_type = request.POST.get('product_type')
-        category_id = request.POST.get('category_id')
-        budget_min = request.POST.get('budget_min')
-        budget_max = request.POST.get('budget_max')
-        preferred_brand = request.POST.get('preferred_brand')
-        condition_type = request.POST.get('condition_type')
-        additional_requirements = request.POST.get('additional_requirements')
-        required_by = request.POST.get('required_by')
+        product_type = request.POST.get('product_type', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
+        budget_min_raw = request.POST.get('budget_min', '').strip()
+        budget_max_raw = request.POST.get('budget_max', '').strip()
+        preferred_brand = request.POST.get('preferred_brand', '').strip()
+        condition_type = request.POST.get('condition_type', '').strip()
+        additional_requirements = request.POST.get(
+            'additional_requirements', ''
+        ).strip()
+        required_by = request.POST.get('required_by', '').strip()
         images = request.FILES.getlist('image')
 
+        for image in images:
+            image_error = validate_image_file(image)
+
+            if image_error:
+                messages.error(request, image_error)
+                return render(
+                    request,
+                    'marketplace/post_requirement.html',
+                    {
+                        'categories': categories,
+                        'today': timezone.now().date().isoformat()
+                    }
+                )
+
+
+        # Required field validation
+        if not product_type:
+            messages.error(request, 'Product type is required.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+        
+        if len(product_type) > 100:
+            messages.error(
+                request,
+                'Product type must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {
+                    'categories': categories,
+                    'today': timezone.now().date().isoformat()
+                }
+            )
+
+        if len(preferred_brand) > 100:
+            messages.error(
+                request,
+                'Preferred brand must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {
+                    'categories': categories,
+                    'today': timezone.now().date().isoformat()
+                }
+            )
+
+        if not category_id:
+            messages.error(request, 'Category is required.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if not budget_min_raw or not budget_max_raw:
+            messages.error(
+                request,
+                'Minimum and maximum budget are required.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if not condition_type:
+            messages.error(request, 'Preferred condition is required.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if not required_by:
+            messages.error(request, 'Required date is required.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        # Validate category
+        try:
+            category = Categories.objects.get(id=category_id)
+        except (Categories.DoesNotExist, ValueError):
+            messages.error(request, 'Please select a valid category.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        # Validate budget values
+        try:
+            budget_min = Decimal(budget_min_raw)
+            budget_max = Decimal(budget_max_raw)
+        except InvalidOperation:
+            messages.error(request, 'Please enter valid budget amounts.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if budget_min <= 0 or budget_max <= 0:
+            messages.error(
+                request,
+                'Budget amounts must be greater than zero.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if budget_min > Decimal('99999999.99') or budget_max > Decimal('99999999.99'):
+            messages.error(
+                request,
+                'Budget amounts must not exceed 99,999,999.99.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if budget_min > budget_max:
+            messages.error(
+                request,
+                'Minimum budget cannot be greater than maximum budget.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        # Validate condition
+        if condition_type not in ['new', 'used']:
+            messages.error(
+                request,
+                'Please select a valid product condition.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        # Validate required date
+        try:
+            required_date = timezone.datetime.strptime(
+                required_by,
+                '%Y-%m-%d'
+            ).date()
+        except ValueError:
+            messages.error(request, 'Please enter a valid required date.')
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        if required_date < timezone.localdate():
+            messages.error(
+                request,
+                'Required date cannot be in the past.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
+        # Create requirement only after all validations pass
         requirement = Requirements.objects.create(
             buyer=buyer,
-            category_id=category_id,
+            category=category,
             product_type=product_type,
-            budget_min=budget_min or None,
-            budget_max=budget_max or None,
+            budget_min=budget_min,
+            budget_max=budget_max,
             preferred_brand=preferred_brand or None,
-            condition_type=condition_type or None,
+            condition_type=condition_type,
             additional_requirements=additional_requirements or None,
-            required_by=required_by or None
+            required_by=required_date
         )
 
+        # Save reference images
         for image in images:
             image_path = default_storage.save(
                 f'requirement_images/{image.name}',
@@ -174,7 +502,7 @@ def post_requirement(request):
         # Notify matching sellers about the new requirement
         sellers = Users.objects.filter(
             role='seller',
-            category_id=category_id
+            category_id=category.id
         )
 
         for seller in sellers:
@@ -184,8 +512,7 @@ def post_requirement(request):
                     f'New buyer requirement. '
                     f'Buyer: {buyer.name}. '
                     f'Product: {product_type}. '
-                    f'Budget: ₹{budget_min or "Not specified"} - '
-                    f'₹{budget_max or "Not specified"}.'
+                    f'Budget: ₹{budget_min} - ₹{budget_max}.'
                 ),
                 created_at=timezone.now()
             )
@@ -193,14 +520,13 @@ def post_requirement(request):
         messages.success(request, 'Requirement posted successfully.')
         return redirect('/my-requirements/')
 
-    categories = Categories.objects.all()
-
     return render(
         request,
         'marketplace/post_requirement.html',
         {'categories': categories}
     )
 
+@never_cache
 def my_requirements(request):
     buyer_id = request.session.get('user_id')
 
@@ -220,6 +546,7 @@ def my_requirements(request):
         {'requirements': requirements}
     )
 
+@never_cache
 def seller_dashboard(request):
     seller_id = request.session.get('user_id')
 
@@ -229,10 +556,18 @@ def seller_dashboard(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(
-        id=seller_id,
-        role='seller'
-    )
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
     unread_count = Notifications.objects.filter(
         user_id=seller_id,
@@ -259,7 +594,8 @@ def seller_dashboard(request):
             'total_reviews': total_reviews
         }
     )
-    
+
+@never_cache   
 def selected_orders(request):
     seller_id = request.session.get('user_id')
 
@@ -269,7 +605,18 @@ def selected_orders(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
     orders = Orders.objects.filter(
         offer__product__seller=seller
@@ -291,6 +638,8 @@ def selected_orders(request):
         }
     )
 
+
+@never_cache
 def buyer_requirements(request):
     seller_id = request.session.get('user_id')
 
@@ -300,7 +649,18 @@ def buyer_requirements(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
     requirements = Requirements.objects.filter(
         category_id=seller.category_id
@@ -391,6 +751,7 @@ def buyer_requirements(request):
         }
     )
 
+@never_cache
 def submit_offer(request, requirement_id):
     seller_id = request.session.get('user_id')
 
@@ -400,7 +761,19 @@ def submit_offer(request, requirement_id):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
+
     try:
         requirement = Requirements.objects.get(
             id=requirement_id,
@@ -414,8 +787,6 @@ def submit_offer(request, requirement_id):
         )
         return redirect('/buyer-requirements/')
 
-    
-
     # Prevent duplicate offers from the same seller
     existing_offer = Offers.objects.filter(
         requirement=requirement,
@@ -426,29 +797,289 @@ def submit_offer(request, requirement_id):
         return redirect(f'/update-offer/{existing_offer.id}/')
 
     if request.method == 'POST':
-        product_name = request.POST.get('product_name')
-        product_description = request.POST.get('product_description')
-        product_price = request.POST.get('product_price')
-        condition_type = request.POST.get('condition_type')
-        brand = request.POST.get('brand')
+        product_name = request.POST.get('product_name', '').strip()
+        product_description = request.POST.get(
+            'product_description', ''
+        ).strip()
+        product_price_raw = request.POST.get(
+            'product_price', ''
+        ).strip()
+        condition_type = request.POST.get(
+            'condition_type', ''
+        ).strip()
+        brand = request.POST.get('brand', '').strip()
 
-        offer_price = request.POST.get('offer_price')
-        delivery_days = request.POST.get('delivery_days')
-        warranty = request.POST.get('warranty')
-        message = request.POST.get('message')
+        offer_price_raw = request.POST.get(
+            'offer_price', ''
+        ).strip()
+        delivery_days_raw = request.POST.get(
+            'delivery_days', ''
+        ).strip()
+        warranty = request.POST.get('warranty', '').strip()
+        message = request.POST.get('message', '').strip()
 
-        # Get uploaded product images
         product_images = request.FILES.getlist('product_image')
 
-        # Create product
+        for image in product_images:
+            image_error = validate_image_file(image)
+
+            if image_error:
+                messages.error(request, image_error)
+                return render(
+                    request,
+                    'marketplace/submit_offer.html',
+                    {'requirement': requirement}
+                )
+
+        # Required field validation
+        if not product_name:
+            messages.error(request, 'Product name is required.')
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not product_description:
+            messages.error(
+                request,
+                'Product description is required.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not product_price_raw:
+            messages.error(request, 'Product price is required.')
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not condition_type:
+            messages.error(request, 'Product condition is required.')
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not brand:
+            messages.error(
+                request,
+                'Brand is required. Enter "Unbranded" if applicable.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not product_images:
+            messages.error(
+                request,
+                'At least one product image is required.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not offer_price_raw:
+            messages.error(request, 'Offer price is required.')
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not delivery_days_raw:
+            messages.error(request, 'Delivery days is required.')
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if not warranty:
+            messages.error(
+                request,
+                'Warranty information is required. '
+                'Enter "No Warranty" if applicable.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if len(product_name) > 150:
+            messages.error(
+                request,
+                'Product name must not exceed 150 characters.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if len(brand) > 100:
+            messages.error(
+                request,
+                'Brand must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if len(warranty) > 100:
+            messages.error(
+                request,
+                'Warranty information must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        # Validate product and offer prices
+        try:
+            product_price = Decimal(product_price_raw)
+            offer_price = Decimal(offer_price_raw)
+        except InvalidOperation:
+            messages.error(
+                request,
+                'Please enter valid product and offer prices.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if (
+            not product_price.is_finite()
+            or not offer_price.is_finite()
+        ):
+            messages.error(
+                request,
+                'Please enter valid product and offer prices.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if product_price <= 0:
+            messages.error(
+                request,
+                'Product price must be greater than zero.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if offer_price <= 0:
+            messages.error(
+                request,
+                'Offer price must be greater than zero.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if product_price > Decimal('99999999.99'):
+            messages.error(
+                request,
+                'Product price must not exceed 99,999,999.99.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if offer_price > Decimal('99999999.99'):
+            messages.error(
+                request,
+                'Offer price must not exceed 99,999,999.99.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        # Validate delivery days
+        try:
+            delivery_days = int(delivery_days_raw)
+        except ValueError:
+            messages.error(
+                request,
+                'Delivery days must be a valid whole number.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if delivery_days < 0:
+            messages.error(
+                request,
+                'Delivery days cannot be negative.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        if delivery_days > 365:
+            messages.error(
+                request,
+                'Delivery days cannot exceed 365 days.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        # Validate condition
+        if condition_type not in ['new', 'used']:
+            messages.error(
+                request,
+                'Please select a valid product condition.'
+            )
+            return render(
+                request,
+                'marketplace/submit_offer.html',
+                {'requirement': requirement}
+            )
+
+        # Create product only after all validation passes
         product = Products.objects.create(
             seller=seller,
             category=requirement.category,
             product_name=product_name,
-            description=product_description or None,
+            description=product_description,
             price=product_price,
             condition_type=condition_type,
-            brand=brand or None
+            brand=brand
         )
 
         # Save product images
@@ -468,8 +1099,8 @@ def submit_offer(request, requirement_id):
             requirement=requirement,
             product=product,
             offer_price=offer_price,
-            delivery_days=delivery_days or None,
-            warranty=warranty or None,
+            delivery_days=delivery_days,
+            warranty=warranty,
             message=message or None
         )
 
@@ -481,15 +1112,19 @@ def submit_offer(request, requirement_id):
         Notifications.objects.create(
             user_id=requirement.buyer_id,
             message=(
-                f'New offer received for your {requirement.product_type} requirement. '
+                f'New offer received for your '
+                f'{requirement.product_type} requirement. '
                 f'Seller: {seller.name}. '
                 f'Product: {product.product_name}. '
                 f'Offer Price: ₹{offer_price}. '
-                f'Delivery: {delivery_days or "Not specified"} days.'
+                f'Delivery: {delivery_days} days.'
             )
         )
 
-        messages.success(request, 'Offer submitted successfully.')
+        messages.success(
+            request,
+            'Offer submitted successfully.'
+        )
         return redirect('/buyer-requirements/')
 
     return render(
@@ -497,7 +1132,8 @@ def submit_offer(request, requirement_id):
         'marketplace/submit_offer.html',
         {'requirement': requirement}
     )
-    
+
+@never_cache
 def update_offer(request, offer_id):
     seller_id = request.session.get('user_id')
 
@@ -507,34 +1143,430 @@ def update_offer(request, offer_id):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
-    offer = Offers.objects.get(
-        id=offer_id,
-        product__seller=seller
-    )
+    try:
+        offer = Offers.objects.get(
+            id=offer_id,
+            product__seller=seller
+        )
+    except Offers.DoesNotExist:
+        messages.error(request, 'Offer not found or unavailable.')
+        return redirect('/buyer-requirements/')
 
     # Prevent updating offers after requirement is closed or selected
     if offer.requirement.status in ['Closed', 'Selected']:
         messages.error(
             request,
-            'This offer can no longer be updated because the requirement is closed or selected.'
+            'This offer can no longer be updated because '
+            'the requirement is closed or selected.'
         )
         return redirect('/buyer-requirements/')
 
-    product = offer.products
+    product = offer.product
 
     if request.method == 'POST':
-        product.product_name = request.POST.get('product_name')
-        product.description = request.POST.get('product_description') or None
-        product.price = request.POST.get('product_price')
-        product.condition_type = request.POST.get('condition_type')
-        product.brand = request.POST.get('brand') or None
+        product_name = request.POST.get(
+            'product_name', ''
+        ).strip()
+
+        product_description = request.POST.get(
+            'product_description', ''
+        ).strip()
+
+        product_price_raw = request.POST.get(
+            'product_price', ''
+        ).strip()
+
+        condition_type = request.POST.get(
+            'condition_type', ''
+        ).strip()
+
+        brand = request.POST.get(
+            'brand', ''
+        ).strip()
+
+        offer_price_raw = request.POST.get(
+            'offer_price', ''
+        ).strip()
+
+        delivery_days_raw = request.POST.get(
+            'delivery_days', ''
+        ).strip()
+
+        warranty = request.POST.get(
+            'warranty', ''
+        ).strip()
+
+        message = request.POST.get(
+            'message', ''
+        ).strip()
+
+        new_product_images = request.FILES.getlist(
+            'product_images'
+        )
+
+        for image in new_product_images:
+            image_error = validate_image_file(image)
+
+            if image_error:
+                messages.error(request, image_error)
+                return render(
+                    request,
+                    'marketplace/update_offer.html',
+                    {
+                        'offer': offer,
+                        'product': product
+                    }
+                )
+
+        # Required field validation
+        if not product_name:
+            messages.error(
+                request,
+                'Product name is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not product_description:
+            messages.error(
+                request,
+                'Product description is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not product_price_raw:
+            messages.error(
+                request,
+                'Product price is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not condition_type:
+            messages.error(
+                request,
+                'Product condition is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not brand:
+            messages.error(
+                request,
+                'Brand is required. '
+                'Enter "Unbranded" if applicable.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not offer_price_raw:
+            messages.error(
+                request,
+                'Offer price is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not delivery_days_raw:
+            messages.error(
+                request,
+                'Delivery days is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if not warranty:
+            messages.error(
+                request,
+                'Warranty information is required. '
+                'Enter "No Warranty" if applicable.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if len(product_name) > 150:
+            messages.error(
+                request,
+                'Product name must not exceed 150 characters.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if len(brand) > 100:
+            messages.error(
+                request,
+                'Brand must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if len(warranty) > 100:
+            messages.error(
+                request,
+                'Warranty information must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        # Validate prices
+        try:
+            product_price = Decimal(product_price_raw)
+            offer_price = Decimal(offer_price_raw)
+        except InvalidOperation:
+            messages.error(
+                request,
+                'Please enter valid product and offer prices.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if (
+            not product_price.is_finite()
+            or not offer_price.is_finite()
+        ):
+            messages.error(
+                request,
+                'Please enter valid product and offer prices.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if product_price <= 0:
+            messages.error(
+                request,
+                'Product price must be greater than zero.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if offer_price <= 0:
+            messages.error(
+                request,
+                'Offer price must be greater than zero.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if product_price > Decimal('99999999.99'):
+            messages.error(
+                request,
+                'Product price must not exceed 99,999,999.99.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if offer_price > Decimal('99999999.99'):
+            messages.error(
+                request,
+                'Offer price must not exceed 99,999,999.99.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        # Validate condition
+        if condition_type not in ['new', 'used']:
+            messages.error(
+                request,
+                'Please select a valid product condition.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        # Validate delivery days
+        try:
+            delivery_days = int(delivery_days_raw)
+        except ValueError:
+            messages.error(
+                request,
+                'Delivery days must be a valid whole number.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if delivery_days < 0:
+            messages.error(
+                request,
+                'Delivery days cannot be negative.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        if delivery_days > 365:
+            messages.error(
+                request,
+                'Delivery days cannot exceed 365 days.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        # An updated offer must still have at least one product image
+        existing_images = ProductImages.objects.filter(
+            product=product
+        ).exists()
+
+        if not existing_images and not new_product_images:
+            messages.error(
+                request,
+                'At least one product image is required.'
+            )
+            return render(
+                request,
+                'marketplace/update_offer.html',
+                {
+                    'offer': offer,
+                    'product': product
+                }
+            )
+
+        # Update product only after validation passes
+        product.product_name = product_name
+        product.description = product_description
+        product.price = product_price
+        product.condition_type = condition_type
+        product.brand = brand
         product.save()
 
-        # Add new product images
-        new_product_images = request.FILES.getlist('product_images')
-
+        # Add newly uploaded product images
         for product_image in new_product_images:
             image_path = default_storage.save(
                 f'product_images/{product_image.name}',
@@ -546,12 +1578,14 @@ def update_offer(request, offer_id):
                 image_path=image_path
             )
 
-        offer.offer_price = request.POST.get('offer_price')
-        offer.delivery_days = request.POST.get('delivery_days') or None
-        offer.warranty = request.POST.get('warranty') or None
-        offer.message = request.POST.get('message') or None
+        # Update offer
+        offer.offer_price = offer_price
+        offer.delivery_days = delivery_days
+        offer.warranty = warranty
+        offer.message = message or None
         offer.save()
 
+        # Notify buyer
         Notifications.objects.create(
             user_id=offer.requirement.buyer_id,
             message=(
@@ -559,12 +1593,15 @@ def update_offer(request, offer_id):
                 f'Seller: {seller.name}. '
                 f'Product: {product.product_name}. '
                 f'New Offer Price: ₹{offer.offer_price}. '
-                f'Delivery: {offer.delivery_days or "Not specified"} days.'
+                f'Delivery: {offer.delivery_days} days.'
             ),
             created_at=timezone.now()
         )
 
-        messages.success(request, 'Offer updated successfully.')
+        messages.success(
+            request,
+            'Offer updated successfully.'
+        )
         return redirect('/buyer-requirements/')
 
     return render(
@@ -576,6 +1613,7 @@ def update_offer(request, offer_id):
         }
     )
 
+@never_cache
 def view_offers(request, requirement_id):
     buyer_id = request.session.get('user_id')
 
@@ -585,10 +1623,17 @@ def view_offers(request, requirement_id):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    requirement = Requirements.objects.get(
-        id=requirement_id,
-        buyer_id=buyer_id
-    )
+    try:
+        requirement = Requirements.objects.get(
+            id=requirement_id,
+            buyer_id=buyer_id
+        )
+    except Requirements.DoesNotExist:
+        messages.error(
+            request,
+            'Requirement not found or unavailable.'
+        )
+        return redirect('/my-requirements/')
 
     offers = Offers.objects.filter(
         requirement=requirement
@@ -636,6 +1681,7 @@ def view_offers(request, requirement_id):
         }
     )
 
+@never_cache
 def select_offer(request, offer_id):
     buyer_id = request.session.get('user_id')
 
@@ -645,10 +1691,25 @@ def select_offer(request, offer_id):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    offer = Offers.objects.get(
-        id=offer_id,
-        requirement__buyer_id=buyer_id
-    )
+    # Offer selection must only happen through POST
+    if request.method != 'POST':
+        messages.error(
+            request,
+            'Invalid offer selection request.'
+        )
+        return redirect('/my-requirements/')
+
+    try:
+        offer = Offers.objects.get(
+            id=offer_id,
+            requirement__buyer_id=buyer_id
+        )
+    except Offers.DoesNotExist:
+        messages.error(
+            request,
+            'Offer not found or unavailable.'
+        )
+        return redirect('/my-requirements/')
 
     # Prevent offer selection for a closed requirement
     if offer.requirement.status == 'Closed':
@@ -656,8 +1717,11 @@ def select_offer(request, offer_id):
             request,
             'This requirement is closed. You cannot select an offer.'
         )
-        return redirect(f'/view-offers/{offer.requirement.id}/')
+        return redirect(
+            f'/view-offers/{offer.requirement.id}/'
+        )
 
+    # Prevent selection if requirement is already selected
     if Orders.objects.filter(
         buyer_id=buyer_id,
         offer__requirement=offer.requirement
@@ -666,7 +1730,9 @@ def select_offer(request, offer_id):
             request,
             'You have already selected an offer for this requirement.'
         )
-        return redirect(f'/view-offers/{offer.requirement.id}/')
+        return redirect(
+            f'/view-offers/{offer.requirement.id}/'
+        )
 
     Orders.objects.create(
         buyer_id=buyer_id,
@@ -677,7 +1743,9 @@ def select_offer(request, offer_id):
 
     # Update requirement status
     offer.requirement.status = 'Selected'
-    offer.requirement.save(update_fields=['status'])
+    offer.requirement.save(
+        update_fields=['status']
+    )
 
     Notifications.objects.create(
         user_id=offer.product.seller_id,
@@ -693,8 +1761,11 @@ def select_offer(request, offer_id):
         f'Offer from {offer.product.seller.name} selected successfully.'
     )
 
-    return redirect(f'/view-offers/{offer.requirement.id}/')
-    
+    return redirect(
+        f'/view-offers/{offer.requirement.id}/'
+    )
+
+@never_cache   
 def my_offers(request):
     seller_id = request.session.get('user_id')
 
@@ -704,7 +1775,18 @@ def my_offers(request):
     if request.session.get('user_role') != 'seller':
         return redirect('/login/')
 
-    seller = Users.objects.get(id=seller_id, role='seller')
+    try:
+        seller = Users.objects.get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        request.session.flush()
+        messages.error(
+            request,
+            'Seller account not found. Please log in again.'
+        )
+        return redirect('/login/')
 
     offers = Offers.objects.filter(
         product__seller=seller
@@ -713,6 +1795,16 @@ def my_offers(request):
         'requirement',
         'requirement__buyer'
     ).order_by('-id')
+
+    for offer in offers:
+        selected_order = Orders.objects.filter(
+            offer__requirement=offer.requirement
+        ).first()
+
+        offer.is_selected = (
+            selected_order is not None
+            and selected_order.offer_id == offer.id
+        )
 
     return render(
         request,
@@ -727,28 +1819,167 @@ def logout_view(request):
     request.session.flush()
     return redirect('/login/')
 
+@never_cache
 def profile(request):
     user_id = request.session.get('user_id')
 
     if not user_id:
         return redirect('/login/')
 
-    user = Users.objects.get(id=user_id)
-
-    if request.method == 'POST':
-        user.name = request.POST.get('name')
-        user.email = request.POST.get('email')
-
-        if user.role == 'seller':
-            category_id = request.POST.get('category_id')
-            user.category_id = category_id
-
-        user.save()
-
-        messages.success(request, 'Profile updated successfully.')
-        return redirect('/profile/')
+    try:
+        user = Users.objects.get(id=user_id)
+    except Users.DoesNotExist:
+        request.session.flush()
+        return redirect('/login/')
 
     categories = Categories.objects.all()
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+
+        # Name validation
+        if not name:
+            messages.error(
+                request,
+                'Name is required.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+
+        # Email validation
+        if not email:
+            messages.error(
+                request,
+                'Email address is required.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+        
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(
+                request,
+                'Please enter a valid email address.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+
+        if len(name) > 100:
+            messages.error(
+                request,
+                'Full name must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+
+        if len(email) > 100:
+            messages.error(
+                request,
+                'Email address must not exceed 100 characters.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+
+        # Prevent another user's email from being used
+        if Users.objects.filter(
+            email__iexact=email
+        ).exclude(id=user.id).exists():
+            messages.error(
+                request,
+                'This email address is already registered.'
+            )
+            return render(
+                request,
+                'marketplace/profile.html',
+                {
+                    'user': user,
+                    'categories': categories
+                }
+            )
+
+        # Seller category validation
+        if user.role == 'seller':
+            category_id = request.POST.get(
+                'category_id', ''
+            ).strip()
+
+            if not category_id:
+                messages.error(
+                    request,
+                    'Please select a selling category.'
+                )
+                return render(
+                    request,
+                    'marketplace/profile.html',
+                    {
+                        'user': user,
+                        'categories': categories
+                    }
+                )
+
+            if not Categories.objects.filter(
+                id=category_id
+            ).exists():
+                messages.error(
+                    request,
+                    'Please select a valid selling category.'
+                )
+                return render(
+                    request,
+                    'marketplace/profile.html',
+                    {
+                        'user': user,
+                        'categories': categories
+                    }
+                )
+
+            user.category_id = category_id
+
+        else:
+            # Buyers must not have a seller category
+            user.category_id = None
+
+        user.name = name
+        user.email = email
+        user.save()
+
+        messages.success(
+            request,
+            'Profile updated successfully.'
+        )
+        return redirect('/profile/')
 
     return render(
         request,
@@ -759,6 +1990,7 @@ def profile(request):
         }
     )
 
+@never_cache
 def notifications(request):
     user_id = request.session.get('user_id')
 
@@ -789,16 +2021,27 @@ def close_requirement(request, requirement_id):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    requirement = Requirements.objects.get(
-        id=requirement_id,
-        buyer_id=buyer_id
-    )
+    try:
+        requirement = Requirements.objects.get(
+            id=requirement_id,
+            buyer_id=buyer_id
+        )
+    except Requirements.DoesNotExist:
+        messages.error(
+            request,
+            'Requirement not found or unavailable.'
+        )
+        return redirect('/my-requirements/')
 
     if request.method == 'POST':
         if requirement.status not in ['Selected', 'Closed']:
             requirement.status = 'Closed'
             requirement.save(update_fields=['status'])
-            messages.success(request, 'Requirement closed successfully.')
+
+            messages.success(
+                request,
+                'Requirement closed successfully.'
+            )
 
         return redirect('/my-requirements/')
 
@@ -916,6 +2159,7 @@ def admin_login(request):
     return redirect('/#admin-login')
 
 
+@never_cache
 def custom_admin_dashboard(request):
     # Only logged-in admin can access
     if not request.session.get('admin_logged_in'):
@@ -954,6 +2198,7 @@ def custom_admin_dashboard(request):
         context
     )
 
+@never_cache
 def admin_manage_buyers(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -970,6 +2215,7 @@ def admin_manage_buyers(request):
         }
     )
 
+@never_cache
 def admin_manage_sellers(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -988,6 +2234,7 @@ def admin_manage_sellers(request):
         }
     )
 
+@never_cache
 def admin_manage_requirements(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -1005,6 +2252,7 @@ def admin_manage_requirements(request):
         }
     )
 
+@never_cache
 def admin_manage_offers(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -1025,6 +2273,7 @@ def admin_manage_offers(request):
         }
     )
 
+@never_cache
 def admin_manage_orders(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -1045,6 +2294,7 @@ def admin_manage_orders(request):
         }
     )
 
+@never_cache
 def admin_manage_reviews(request):
     if not request.session.get('admin_logged_in'):
         return redirect('/')
@@ -1157,12 +2407,12 @@ def admin_remove_offer(request, offer_id):
 
     return redirect('/custom-admin/offers/')
 
+@never_cache
 def custom_admin_logout(request):
-    request.session.pop('admin_logged_in', None)
-    request.session.pop('admin_username', None)
-
+    request.session.flush()
     return redirect('/')
 
+@never_cache
 def seller_public_profile(request, seller_id):
     buyer_id = request.session.get('user_id')
 
@@ -1172,12 +2422,19 @@ def seller_public_profile(request, seller_id):
     if request.session.get('user_role') != 'buyer':
         return redirect('/login/')
 
-    seller = Users.objects.select_related(
-        'category'
-    ).get(
-        id=seller_id,
-        role='seller'
-    )
+    try:
+        seller = Users.objects.select_related(
+            'category'
+        ).get(
+            id=seller_id,
+            role='seller'
+        )
+    except Users.DoesNotExist:
+        messages.error(
+            request,
+            'Seller not found or unavailable.'
+        )
+        return redirect('/my-requirements/')
 
     reviews = Reviews.objects.filter(
         seller_id=seller_id
