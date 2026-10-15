@@ -714,6 +714,193 @@
             font-size: 11px;
         }
 
+        /* ================= COMPACT OFFER CARD ================= */
+
+        .bo-compact-summary {
+            padding: 20px 24px;
+
+            display: grid;
+            grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(110px, .7fr)) auto;
+            align-items: center;
+            gap: 18px;
+
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        .bo-compact-seller {
+            min-width: 0;
+        }
+
+        .bo-compact-seller span {
+            display: block;
+            margin-bottom: 5px;
+
+            color: #989082;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .bo-compact-seller strong {
+            display: block;
+
+            overflow: hidden;
+
+            color: #24211c;
+
+            font-family: Georgia, serif;
+            font-size: 18px;
+            font-weight: 500;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bo-compact-info {
+            padding-left: 17px;
+
+            border-left: 1px solid #ebe4d9;
+        }
+
+        .bo-compact-info span {
+            display: block;
+            margin-bottom: 5px;
+
+            color: #989082;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .bo-compact-info strong {
+            color: #302d27;
+
+            font-size: 13px;
+        }
+
+        .bo-compact-price strong {
+            color: #72570c;
+
+            font-family: Georgia, serif;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .bo-compact-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bo-compact-best {
+            padding: 7px 10px;
+
+            border: 1px solid #b7d4bb;
+            border-radius: 30px;
+
+            background: #eff8f0;
+            color: #397944;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .bo-details-button {
+            min-width: 115px;
+            min-height: 39px;
+
+            padding: 9px 14px;
+
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            cursor: pointer;
+            white-space: nowrap;
+
+            transition: .2s ease;
+        }
+
+        .bo-details-button:hover {
+            transform: translateY(-1px);
+
+            background: #d4af37;
+            color: #111111;
+        }
+
+        /* Full offer information is hidden until View Details is clicked */
+        .bo-expandable-details {
+            display: none;
+
+            border-top: 1px solid #eee8dd;
+        }
+
+        .bo-offer-card.bo-expanded .bo-expandable-details {
+            display: block;
+        }
+
+        .bo-offer-card.bo-expanded .bo-compact-summary {
+            background: #fcfbf8;
+        }
+
+
+        /* ================= COMPACT OFFER RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .bo-compact-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bo-compact-seller {
+                grid-column: 1 / -1;
+            }
+
+            .bo-compact-info {
+                padding-left: 0;
+                border-left: none;
+            }
+
+            .bo-compact-actions {
+                grid-column: 1 / -1;
+            }
+        }
+
+
+        @media (max-width: 550px) {
+
+            .bo-compact-summary {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .bo-compact-seller,
+            .bo-compact-actions {
+                grid-column: auto;
+            }
+
+            .bo-compact-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .bo-details-button {
+                width: 100%;
+            }
+        }
+
         /* ================= OFFER LIST ================= */
 
         .bo-offers-list {
@@ -1843,7 +2030,8 @@
 
         </section>
 
-
+        
+        
         <!-- OFFER LIST -->
         <section class="bo-offers-list">
 
@@ -1852,6 +2040,64 @@
             <article
                 class="bo-offer-card {% if forloop.first %}bo-best-offer{% endif %}"
             >
+
+                <!-- COMPACT OFFER SUMMARY -->
+                <div
+                    class="bo-compact-summary"
+                    onclick="toggleOfferCard(this)"
+                >
+
+                    <div class="bo-compact-seller">
+                        <span>Seller</span>
+                        <strong>
+                            {{ offer.product.seller.name }}
+                        </strong>
+                    </div>
+
+                    <div class="bo-compact-info bo-compact-price">
+                        <span>Offer Price</span>
+                        <strong>
+                            ₹{{ offer.offer_price }}
+                        </strong>
+                    </div>
+
+                    <div class="bo-compact-info">
+                        <span>Delivery</span>
+                        <strong>
+                            {% if offer.delivery_days is not None %}
+                                {{ offer.delivery_days }} Days
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="bo-compact-info">
+                        <span>Warranty</span>
+                        <strong>
+                            {{ offer.warranty|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+                    <div class="bo-compact-actions">
+
+                        {% if forloop.first %}
+                        <span class="bo-compact-best">
+                            ★ Best Price
+                        </span>
+                        {% endif %}
+
+                        <span class="bo-expand-hint">
+                            Click to view details ↓
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FULL OFFER DETAILS -->
+                <div class="bo-expandable-details">
 
 
                 <!-- OFFER HEADER -->
@@ -2196,6 +2442,7 @@
                     {% endif %}
 
                 </div>
+                </div> <!-- closes bo-expandable-details -->
 
             </article>
 
@@ -2278,6 +2525,22 @@
         </span>
 
     </footer>
+
+    <script>
+    function toggleOfferCard(summary) {
+        const card = summary.closest(".bo-offer-card");
+
+        card.classList.toggle("bo-expanded");
+
+        const hint = summary.querySelector(".bo-expand-hint");
+
+        if (card.classList.contains("bo-expanded")) {
+            hint.textContent = "Click to hide details ↑";
+        } else {
+            hint.textContent = "Click to view details ↓";
+        }
+    }
+    </script>
 
 </body>
 

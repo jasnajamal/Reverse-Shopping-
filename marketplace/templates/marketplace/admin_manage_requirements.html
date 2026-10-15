@@ -252,6 +252,85 @@
             background: #d4af37;
             color: #111111;
         }
+
+        /* ===== CLOSE REQUIREMENT MODAL ===== */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            width: 420px;
+            max-width: calc(100% - 30px);
+            padding: 28px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-box h3 {
+            margin: 0 0 10px;
+            color: #171715;
+            font-family: Georgia, serif;
+            font-size: 23px;
+            font-weight: 500;
+        }
+
+        .modal-box p {
+            margin: 0 0 18px;
+            color: #77736a;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .modal-box textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ded5c4;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .modal-cancel {
+            padding: 9px 15px;
+            border: 1px solid #ded5c4;
+            border-radius: 7px;
+            background: white;
+            color: #555047;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .modal-confirm {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 7px;
+            background: #a23c30;
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -417,17 +496,13 @@
                         <td>
                             {% if requirement.status != 'Closed' and requirement.status != 'Selected' %}
 
-                                <form
-                                    method="POST"
-                                    action="/custom-admin/requirements/{{ requirement.id }}/close/"
-                                    onsubmit="return confirm('Are you sure you want to close this requirement?');"
+                                <button
+                                    type="button"
+                                    class="close-button"
+                                    onclick="openCloseModal('{{ requirement.id }}')"
                                 >
-                                    {% csrf_token %}
-
-                                    <button type="submit" class="close-button">
-                                        Close
-                                    </button>
-                                </form>
+                                    Close
+                                </button>
 
                             {% elif requirement.status == 'Closed' %}
 
@@ -465,6 +540,76 @@
         </div>
 
     </main>
+
+    <!-- Close Requirement Modal -->
+    <div id="closeRequirementModal" class="modal-overlay">
+
+        <div class="modal-box">
+
+            <h3>Close Requirement</h3>
+
+            <p>
+                Please provide a reason for closing this requirement.
+                The buyer will be informed about this action.
+            </p>
+
+            <form id="closeRequirementForm" method="POST">
+                {% csrf_token %}
+
+                <textarea
+                    name="reason"
+                    id="closeReason"
+                    placeholder="Enter reason for closing this requirement..."
+                    required
+                ></textarea>
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="modal-cancel"
+                        onclick="closeCloseModal()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="modal-confirm"
+                    >
+                        Close Requirement
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        function openCloseModal(requirementId) {
+            const modal = document.getElementById('closeRequirementModal');
+            const form = document.getElementById('closeRequirementForm');
+            const reason = document.getElementById('closeReason');
+
+            form.action =
+                '/custom-admin/requirements/' + requirementId + '/close/';
+
+            reason.value = '';
+            modal.style.display = 'flex';
+            reason.focus();
+        }
+
+        function closeCloseModal() {
+            const modal = document.getElementById('closeRequirementModal');
+            const reason = document.getElementById('closeReason');
+
+            modal.style.display = 'none';
+            reason.value = '';
+        }
+    </script>
 
 </body>
 </html>

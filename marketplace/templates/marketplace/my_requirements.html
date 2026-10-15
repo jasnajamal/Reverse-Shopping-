@@ -652,6 +652,40 @@
             pointer-events: none;
         }
 
+        /* ================= VIEW MORE ================= */
+
+        .mr-view-more {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: fit-content;
+            min-width: 120px;
+            min-height: 40px;
+
+            margin: 20px 0 0;
+            padding: 9px 18px;
+
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+
+            background: #111111;
+            color: #d4af37;
+
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .mr-view-more:hover {
+            transform: translateY(-2px);
+            background: #d4af37;
+            color: #111111;
+        }
+
         /* ================= ACTION ================= */
 
         .mr-card-action {
@@ -1313,6 +1347,15 @@
 
                     </div>
 
+                    <button
+                        type="button"
+                        class="mr-view-more"
+                        onclick="toggleRequirementDetails(this)"
+                    >
+                        View More
+                    </button>
+
+                    <div class="mr-extra-details" style="display: none;">
 
                     <!-- ADDITIONAL REQUIREMENTS -->
                     <div class="mr-additional">
@@ -1374,6 +1417,7 @@
 
                     {% endif %}
 
+                    </div>
 
                     <!-- VIEW OFFERS -->
                     <div class="mr-card-action">
@@ -1562,6 +1606,19 @@
             document.body.style.overflow = "";
         }
 
+        function toggleRequirementDetails(button) {
+
+            const card = button.closest(".mr-card");
+            const details = card.querySelector(".mr-extra-details");
+
+            if (details.style.display === "none") {
+                details.style.display = "block";
+                button.textContent = "View Less";
+            } else {
+                details.style.display = "none";
+                button.textContent = "View More";
+            }
+        }
 
         document.addEventListener("keydown", function(event) {
 

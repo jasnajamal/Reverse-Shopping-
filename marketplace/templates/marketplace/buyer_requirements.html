@@ -934,6 +934,92 @@
                 width: 100%;
             }
         }
+
+        /* ================= COMPACT REQUIREMENT VIEW ================= */
+
+        .sr-compact-summary {
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            background: #171715;
+            cursor: pointer;
+        }
+
+        .sr-compact-main {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sr-compact-main span {
+            color: #a98b32;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .sr-compact-main h2 {
+            margin: 0;
+            color: #ffffff;
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .sr-compact-info {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .sr-compact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sr-compact-item span {
+            color: #918b7f;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .sr-compact-item strong {
+            color: #ffffff;
+            font-size: 13px;
+        }
+
+        .sr-compact-view {
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .sr-expandable-content {
+            display: none;
+        }
+
+        .sr-requirement-card.sr-expanded .sr-expandable-content {
+            display: block;
+        }
+
+        @media (max-width: 700px) {
+            .sr-compact-summary {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .sr-compact-info {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 15px 25px;
+            }
+        }
+
     </style>
 </head>
 
@@ -1016,6 +1102,50 @@
             {% for item in requirement_data %}
 
             <article class="sr-requirement-card">
+
+             <!-- COMPACT REQUIREMENT SUMMARY -->
+            <div
+                class="sr-compact-summary"
+                onclick="toggleRequirementCard(this)"
+            >
+                <div class="sr-compact-main">
+                    <span>BUYER REQUIREMENT</span>
+                    <h2>{{ item.requirement.product_type }}</h2>
+                </div>
+
+                <div class="sr-compact-info">
+
+                    <div class="sr-compact-item">
+                        <span>Buyer</span>
+                        <strong>{{ item.requirement.buyer.name }}</strong>
+                    </div>
+
+                    <div class="sr-compact-item">
+                        <span>Budget</span>
+                        <strong>
+                            ₹{{ item.requirement.budget_min }}
+                            – ₹{{ item.requirement.budget_max }}
+                        </strong>
+                    </div>
+
+                    <div class="sr-compact-item">
+                        <span>Condition</span>
+                        <strong>
+                            {{ item.requirement.condition_type|default:"Not specified" }}
+                        </strong>
+                    </div>
+
+                    <span class="sr-compact-view">
+                        View Details ↓
+                    </span>
+
+                </div>
+            </div>
+
+            <!-- EXPANDABLE REQUIREMENT CONTENT -->
+            <div class="sr-expandable-content">
+
+    
 
                 <!-- CARD HEADING -->
                 <div class="sr-card-heading">
@@ -1433,6 +1563,7 @@
                     {% endif %}
 
                 </section>
+                </div> <!-- closes sr-expandable-content -->
 
             </article>
 
@@ -1485,6 +1616,22 @@
         </span>
 
     </footer>
+
+    <script>
+    function toggleRequirementCard(summary) {
+        const card = summary.closest(".sr-requirement-card");
+        const viewText = summary.querySelector(".sr-compact-view");
+
+        card.classList.toggle("sr-expanded");
+
+        if (card.classList.contains("sr-expanded")) {
+            viewText.textContent = "Hide Details ↑";
+        } else {
+            viewText.textContent = "View Details ↓";
+        }
+    }
+    </script>
+
 
 </body>
 </html>

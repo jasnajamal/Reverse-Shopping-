@@ -34,6 +34,9 @@ def home(request):
 
 @never_cache
 def login_view(request):
+    if request.method == 'GET':
+        list(messages.get_messages(request))
+        
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -404,6 +407,20 @@ def post_requirement(request):
                 {'categories': categories}
             )
 
+        if (
+            not budget_min.is_finite()
+            or not budget_max.is_finite()
+        ):
+            messages.error(
+                request,
+                'Please enter valid budget amounts.'
+            )
+            return render(
+                request,
+                'marketplace/post_requirement.html',
+                {'categories': categories}
+            )
+
         if budget_min <= 0 or budget_max <= 0:
             messages.error(
                 request,
@@ -506,14 +523,16 @@ def post_requirement(request):
         )
 
         for seller in sellers:
+            notification_message = (
+                f'New buyer requirement. '
+                f'Buyer: {buyer.name}. '
+                f'Product: {product_type}. '
+                f'Budget: ₹{budget_min} - ₹{budget_max}.'
+            )
+
             Notifications.objects.create(
                 user_id=seller.id,
-                message=(
-                    f'New buyer requirement. '
-                    f'Buyer: {buyer.name}. '
-                    f'Product: {product_type}. '
-                    f'Budget: ₹{budget_min} - ₹{budget_max}.'
-                ),
+                message=notification_message[:255],
                 created_at=timezone.now()
             )
 
@@ -1109,16 +1128,19 @@ def submit_offer(request, requirement_id):
             requirement.status = 'Offer Received'
             requirement.save(update_fields=['status'])
 
+        notification_message = (
+            f'New offer received for your '
+            f'{requirement.product_type} requirement. '
+            f'Seller: {seller.name}. '
+            f'Product: {product.product_name}. '
+            f'Offer Price: ₹{offer_price}. '
+            f'Delivery: {delivery_days} days.'
+        )
+
         Notifications.objects.create(
             user_id=requirement.buyer_id,
-            message=(
-                f'New offer received for your '
-                f'{requirement.product_type} requirement. '
-                f'Seller: {seller.name}. '
-                f'Product: {product.product_name}. '
-                f'Offer Price: ₹{offer_price}. '
-                f'Delivery: {delivery_days} days.'
-            )
+            message=notification_message[:255],
+            created_at=timezone.now()
         )
 
         messages.success(
@@ -1586,15 +1608,17 @@ def update_offer(request, offer_id):
         offer.save()
 
         # Notify buyer
+        notification_message = (
+            f'Offer updated. '
+            f'Seller: {seller.name}. '
+            f'Product: {product.product_name}. '
+            f'New Offer Price: ₹{offer.offer_price}. '
+            f'Delivery: {offer.delivery_days} days.'
+        )
+
         Notifications.objects.create(
             user_id=offer.requirement.buyer_id,
-            message=(
-                f'Offer updated. '
-                f'Seller: {seller.name}. '
-                f'Product: {product.product_name}. '
-                f'New Offer Price: ₹{offer.offer_price}. '
-                f'Delivery: {offer.delivery_days} days.'
-            ),
+            message=notification_message[:255],
             created_at=timezone.now()
         )
 
@@ -1752,7 +1776,7 @@ def select_offer(request, offer_id):
         message=(
             f'Your offer for {offer.requirement.product_type} '
             f'has been selected by the buyer.'
-        ),
+        )[:255],
         created_at=timezone.now()
     )
 
@@ -2084,7 +2108,9 @@ def add_review(request, order_id):
 
     if request.method == 'POST':
         rating = request.POST.get('rating')
-        review_text = request.POST.get('review_text')
+        review_text = request.POST.get(
+            'review_text', ''
+        ).strip()
 
         # Rating must be between 1 and 5
         try:
@@ -2350,18 +2376,39 @@ def admin_close_requirement(request, requirement_id):
             id=requirement_id
         )
 
+        reason = request.POST.get('reason', '').strip()
+
+        if not reason:
+            messages.error(
+                request,
+                'Please provide a reason for closing the requirement.'
+            )
+            return redirect('/custom-admin/requirements/')
+
         if requirement.status not in ['Closed', 'Selected']:
             requirement.status = 'Closed'
             requirement.save(
                 update_fields=['status']
             )
 
+            notification_message = (
+                f'Your requirement for {requirement.product_type} was closed '
+                f'by the administrator. Reason: {reason}'
+            )
+
+            Notifications.objects.create(
+                user_id=requirement.buyer_id,
+                message=notification_message[:255],
+                created_at=timezone.now()
+            )
+
             messages.success(
                 request,
-                'Requirement closed successfully.'
+                'Requirement closed successfully. The buyer has been notified.'
             )
+
         else:
-            messages.info(
+            messages.error(
                 request,
                 'This requirement cannot be closed.'
             )
@@ -2384,6 +2431,15 @@ def admin_remove_offer(request, offer_id):
     try:
         offer = Offers.objects.get(id=offer_id)
 
+        reason = request.POST.get('reason', '').strip()
+
+        if not reason:
+            messages.error(
+                request,
+                'Please provide a reason for removing the offer.'
+            )
+            return redirect('/custom-admin/offers/')
+
         # Do not delete an offer that has already been selected
         if Orders.objects.filter(offer=offer).exists():
             messages.error(
@@ -2392,11 +2448,25 @@ def admin_remove_offer(request, offer_id):
             )
             return redirect('/custom-admin/offers/')
 
+        seller_id = offer.product.seller_id
+        product_name = offer.product.product_name
+
+        notification_message = (
+            f'Your offer for {product_name} was removed by the administrator. '
+            f'Reason: {reason}'
+        )
+
+        Notifications.objects.create(
+            user_id=seller_id,
+            message=notification_message[:255],
+            created_at=timezone.now()
+        )
+
         offer.delete()
 
         messages.success(
             request,
-            'Offer removed successfully.'
+            'Offer removed successfully. The seller has been notified.'
         )
 
     except Offers.DoesNotExist:
